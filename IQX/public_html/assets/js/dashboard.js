@@ -1,7 +1,7 @@
 // dashboard-supabase.js — Full Supabase migration (copy/paste)
 // Replace with your Supabase values OR create client globally and remove the createClient call.
 const SUPABASE_URL = 'https://your-supabase-url.supabase.co'; // <- REPLACE
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // <- REPLACE
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFxb3RucGJjcnFhaXFvbnBmc2hqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDUwNDMsImV4cCI6MjA3NTQ4MTA0M30.rqwwCxMp2PBydSE99QJOL-nt1UjxkI7-ea0Q8Wk5SVI'; // <- REPLACE
 
 document.addEventListener('DOMContentLoaded', async () => {
   // --- Ensure Supabase client available ---
