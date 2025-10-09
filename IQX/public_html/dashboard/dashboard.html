@@ -9,46 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css"
         integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
-        
-    <script type="module">
-  // Import Firebase SDKs
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-  // Firebase config
-  const firebaseConfig = {
-    apiKey: "AIzaSyBTGdLyfpv9xzmh5hYoctay0Ev4W4lpAjM",
-    authDomain: "cboefirebaseserver.firebaseapp.com",
-    projectId: "cboefirebaseserver",
-    storageBucket: "cboefirebaseserver.firebasestorage.app",
-    messagingSenderId: "755491003217",
-    appId: "1:755491003217:web:2a10ffad1f38c9942f5170"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-
-  // Handle auth state
-  onAuthStateChanged(auth, (user) => {
-    if (!user) {
-      window.location.replace("../login/login.html");
-    }
-  });
-
-  // Make available to dashboard.js
-  window.firebaseApp = app;
-  window.auth = auth;
-  window.db = db;
-
-  // Logout function
-  window.handleLogout = async () => {
-    await signOut(auth);
-    window.location.replace("../login/login.html");
-  };
-</script>
+      
     </head>
 
 <body class="light-mode">
@@ -249,7 +210,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <!--  <script type="module" src="./firebase-config.js"></script> -->
-
+  
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="../assets/js/dashboard.js"></script>
 </body>
 
