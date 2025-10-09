@@ -53,7 +53,7 @@
 
     <!-- nav -->
     <nav>
-        <div class="logo"><i class="fa-solid fa-globe"></i> IQX  Broker</div>
+        <div class="logo"><i class="fa-solid fa-globe"></i> IQX Broker</div>
         <!-- <div class="logo"><img src="../public_html/assets/images/cboe_header_logo.jpg" alt="cboe logo"></div> -->
         <ul class="nav-links" id="navLinks">
             <li><a href="#home">Home</a></li>
@@ -87,28 +87,32 @@
             </p>
             <a href="./register/register.html">Get Started Now</a>
 
-            <div class="boxes">
+            <div class="boxes" id="counter-section">
+
                 <div class="box">
                     <div class="icon">
                         <i class="fa-solid fa-globe"></i>
                     </div>
-                    <div class="number">80+</div>
+                    <div class="number" id="stat1" data-target="80">80k+</div>
                     <p>Country Served</p>
                 </div>
+
                 <div class="box">
                     <div class="icon">
                         <i class="fa-solid fa-certificate"></i>
                     </div>
-                    <div class="number">100k+</div>
+                    <div class="number" id="stat2" data-target="100">100k+</div>
                     <p>Verified Accounts</p>
                 </div>
+
                 <div class="box">
                     <div class="icon">
                         <i class="fa-solid fa-users"></i>
                     </div>
-                    <div class="number">380k+</div>
+                    <div class="number" id="stat3" data-target="380">380k+</div>
                     <p>Registered Users</p>
                 </div>
+
             </div>
         </div>
 
@@ -143,22 +147,6 @@
 
     <!-- popup -->
     <div id="popup-container"></div>
-
-    <!-- Image Slider -->
-    <div class="slider-container">
-        <div class="slider-wrapper">
-            <img src="./assets/images/defimikesotero-20250927-0002.jpg" alt="Image 1">
-            <img src="./assets/images/big-russell-photo.jpg" alt="Image 2">
-            <img src="./assets/images/card-markets-header.jpg" alt="Image 3">
-            <img src="./assets/images/cash-equities-photo.png" alt="Image 4">
-            <img src="./assets/images/notable-trades-photo.jpg" alt="Image 5">
-        </div>
-
-        <button class="nav-button prev-button">&#10094;</button> <button
-            class="nav-button next-button">&#10095;</button>
-        <div class="pagination-dots"></div>
-    </div>
-    <hr>
 
     <!-- newsletter -->
     <section id="newsletter" class="container">
@@ -339,6 +327,7 @@
 
     </section>
 
+
     <!-- join Courses -->
     <section id="service">
         <div id="join-courses" class="zoom-in">
@@ -463,9 +452,9 @@
     <!-- about cboe -->
     <section id="cboe" class="zoom-in">
         <h2>What is <span> IQX Broker</span> and what does it offers?</h2>
-        <div class="abt-cboe-image">
+        <!-- <div class="abt-cboe-image">
             <img src="./assets/images/cboe_logo_inv_50th-footer.svg" alt="Cboe logo Image">
-        </div>
+        </div> -->
         <div class="abt-cboe">
             <div class="about-cboe zoom-in">
                 <p>IQX Broker, is one of the world's largest exchange holding companies, providing
@@ -765,9 +754,9 @@
     </script>
 
     <!-- Vanta js globe header background CDN & Script-->
-     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
-     <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
-     <script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
+    <script>
         VANTA.GLOBE({
             el: "#vanta-globe",
             mouseControls: true,
@@ -781,7 +770,7 @@
             color2: 0x0055ff,
             backgroundColor: 0x000015,
         })
-     </script>
+    </script>
     <script src="./assets/js/main.js"></script>
 </body>
 

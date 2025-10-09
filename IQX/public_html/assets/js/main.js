@@ -8,6 +8,61 @@ document.addEventListener('DOMContentLoaded', () => {
     const navLinks = document.getElementById('navLinks');
     const icon = hamburger.querySelector('i');
 
+    //==== Counter ==== 
+    // Function to handle the counting animation
+    function animateValue(obj, start, end, duration, suffix) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+
+            // Calculate the current number
+            const currentValue = Math.floor(progress * (end - start) + start);
+
+            // Update the element's text content with the number and the suffix
+            obj.textContent = currentValue.toLocaleString() + suffix;
+
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    // Function to start animations for all counter items
+    function startCounters(entries, observer) {
+        entries.forEach(entry => {
+            // Check if the section is in view and hasn't been animated yet
+            if (entry.isIntersecting && !entry.target.dataset.animated) {
+
+                const counterNumbers = entry.target.querySelectorAll('.number');
+
+                counterNumbers.forEach(numDiv => {
+                    const targetValue = parseInt(numDiv.getAttribute('data-target'));
+                    // Determine the suffix (e.g., 'k+', 'yrs+') from the original text
+                    const originalText = numDiv.textContent;
+                    const suffix = originalText.replace(targetValue, '').trim();
+
+                    animateValue(numDiv, 0, targetValue, 2500, suffix); // 2.5 second animation
+                });
+
+                entry.target.dataset.animated = 'true'; // Mark as animated
+                observer.unobserve(entry.target); // Stop observing
+            }
+        });
+    }
+
+    // Set up the Intersection Observer to trigger the animation on scroll
+    const counterSection = document.querySelector('.boxes');
+    if (counterSection) {
+        const observer = new IntersectionObserver(startCounters, {
+            root: null, // relative to the viewport
+            threshold: 0.5 // trigger when 50% of the element is visible
+        });
+
+        observer.observe(counterSection);
+    }
+
     // Onload Alert
     window.onload = () => {
         if (window.innerWidth <= 768) {
@@ -19,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // }
         } else {
             const alertOverlay = document.getElementById('alertOverlay');
-             alertBox.style.display = 'none';
+            alertBox.style.display = 'none';
         }
     };
 
@@ -51,94 +106,94 @@ document.addEventListener('DOMContentLoaded', () => {
             hamburger.setAttribute("aria-expanded", false);
         });
     });
-    
-    
-    
+
+
+
     /* popups */
-const popupQueue = [];
-let isShowingPopup = false;
+    const popupQueue = [];
+    let isShowingPopup = false;
 
-function queuePopup(message, type = "info") {
-  popupQueue.push({ message, type });
-  if (!isShowingPopup) {
-    showNextPopup();
-  }
-}
+    function queuePopup(message, type = "info") {
+        popupQueue.push({ message, type });
+        if (!isShowingPopup) {
+            showNextPopup();
+        }
+    }
 
-function showNextPopup() {
-  if (popupQueue.length === 0) {
-    isShowingPopup = false;
-    return;
-  }
+    function showNextPopup() {
+        if (popupQueue.length === 0) {
+            isShowingPopup = false;
+            return;
+        }
 
-  isShowingPopup = true;
-  const { message, type } = popupQueue.shift();
+        isShowingPopup = true;
+        const { message, type } = popupQueue.shift();
 
-  const container = document.getElementById("popup-container");
-  const popup = document.createElement("div");
-  popup.className = `popup ${type}`;
-  popup.textContent = message;
+        const container = document.getElementById("popup-container");
+        const popup = document.createElement("div");
+        popup.className = `popup ${type}`;
+        popup.textContent = message;
 
-  container.appendChild(popup);
+        container.appendChild(popup);
 
-  // trigger animation
-  setTimeout(() => popup.classList.add("show"), 50);
+        // trigger animation
+        setTimeout(() => popup.classList.add("show"), 50);
 
-  // auto-remove after 4s and show next
-  setTimeout(() => {
-    popup.classList.remove("show");
-    setTimeout(() => {
-      popup.remove();
-      showNextPopup();
-    }, 800);
-  }, 4000);
-}
+        // auto-remove after 4s and show next
+        setTimeout(() => {
+            popup.classList.remove("show");
+            setTimeout(() => {
+                popup.remove();
+                showNextPopup();
+            }, 800);
+        }, 4000);
+    }
 
-// === Fake random data ===
-const names = [
-  "Michael", "Sarah", "James", "Emma", "David", "Sophia", "Daniel",
-  "Olivia", "Liam", "Mia", "Noah", "Ava", "Ethan", "Isabella",
-  "Lucas", "Amelia", "Mason", "Charlotte", "Henry", "Grace"
-];
+    // === Fake random data ===
+    const names = [
+        "Michael", "Sarah", "James", "Emma", "David", "Sophia", "Daniel",
+        "Olivia", "Liam", "Mia", "Noah", "Ava", "Ethan", "Isabella",
+        "Lucas", "Amelia", "Mason", "Charlotte", "Henry", "Grace"
+    ];
 
-function randomAmount(min = 20, max = 8000) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+    function randomAmount(min = 20, max = 8000) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
 
-function randomTime() {
-  const mins = Math.floor(Math.random() * 59) + 1; // 1–59 minutes
-  const hours = Math.floor(Math.random() * 5) + 1; // 1–5 hours
-  const days = Math.floor(Math.random() * 2) + 1;  // 1–2 days
+    function randomTime() {
+        const mins = Math.floor(Math.random() * 59) + 1; // 1–59 minutes
+        const hours = Math.floor(Math.random() * 5) + 1; // 1–5 hours
+        const days = Math.floor(Math.random() * 2) + 1;  // 1–2 days
 
-  const rand = Math.random();
-  if (rand < 0.6) return `${mins} mins ago`;
-  if (rand < 0.9) return `${hours} hours ago`;
-  return `${days} days ago`;
-}
+        const rand = Math.random();
+        if (rand < 0.6) return `${mins} mins ago`;
+        if (rand < 0.9) return `${hours} hours ago`;
+        return `${days} days ago`;
+    }
 
-function randomMessage() {
-  const name = names[Math.floor(Math.random() * names.length)];
-  const amount = randomAmount();
-  const time = randomTime();
+    function randomMessage() {
+        const name = names[Math.floor(Math.random() * names.length)];
+        const amount = randomAmount();
+        const time = randomTime();
 
-  if (Math.random() < 0.5) {
-    return { 
-      text: `${name} withdrew $${amount} ${time}`, 
-      type: "error" 
-    };
-  } else {
-    return { 
-      text: `${name} earned $${amount} ${time}`, 
-      type: "success" 
-    };
-  }
-}
+        if (Math.random() < 0.5) {
+            return {
+                text: `${name} withdrew $${amount} ${time}`,
+                type: "error"
+            };
+        } else {
+            return {
+                text: `${name} earned $${amount} ${time}`,
+                type: "success"
+            };
+        }
+    }
 
-// === Generate 100 popups ===
-for (let i = 0; i < 100; i++) {
-  const { text, type } = randomMessage();
-  queuePopup(text, type);
-}
+    // === Generate 100 popups ===
+    for (let i = 0; i < 100; i++) {
+        const { text, type } = randomMessage();
+        queuePopup(text, type);
+    }
 
     /* back to top */
     const backToTopBtn = document.getElementById('backToTop');
@@ -159,94 +214,6 @@ for (let i = 0; i < 100; i++) {
             behavior: 'smooth'
         });
     });
-
-    let currentIndex = 0;
-    const totalImages = images.length;
-    let autoPlayInterval;
-    const autoPlayDelay = 3000;
-
-    // update the slider's position
-    const updateSliderPosition = () => {
-        /* 
-        calculate how much to move the slider-wrapper horizontally
-        Each images takes 100% width, so we move by multiples of 100%
-        */
-
-        const offset = -currentIndex * 100;
-        sliderWrapper.style.transform = `translateX(${offset}%)`;
-
-        // you still have to update the active dots
-        updatePaginationDots();
-    };
-
-    // pagination dots logic
-    const createPaginationDots = () => {
-        for (let i = 0; i < totalImages; i++) {
-            const dot = document.createElement('span');
-            dot.classList.add('dot');
-            dot.dataset.index = i;
-            paginationDotsContainer.appendChild(dot);
-
-            dot.addEventListener('click', () => {
-                currentIndex = i; // set current index to the clicked dot's index
-                updateSliderPosition();
-                resetAutoPlay(); // reset auto-play or manual interaction
-            });
-        }
-        updatePaginationDots(); // set initial active dot
-    };
-
-    const updatePaginationDots = () => {
-        const dots = document.querySelectorAll('.dot');
-        dots.forEach((dot, index) => {
-            if (index === currentIndex) {
-                dot.classList.add('active');
-            } else {
-                dot.classList.remove('active');
-            }
-        });
-    };
-
-    // Navigation Logic
-    const showNextImage = () => {
-        currentIndex = (currentIndex + 1) % totalImages; // Cycle through images
-        updateSliderPosition();
-        resetAutoPlay();
-    };
-
-    const showPrevImage = () => {
-        currentIndex = (currentIndex - 1 + totalImages) % totalImages; // cycle back 
-        updateSliderPosition();
-        resetAutoPlay();
-    };
-
-    // Auto-Play Logic
-    const startAutoPlay = () => {
-        // Clear any existing to prevent multiple timers running
-        clearInterval(autoPlayInterval);
-        autoPlayInterval = setInterval(showNextImage, autoPlayDelay);
-    };
-
-    const stopAutoPlay = () => {
-        clearInterval(autoPlayInterval);
-    };
-
-    const resetAutoPlay = () => {
-        stopAutoPlay();
-        startAutoPlay();
-    };
-
-    nextButton.addEventListener('click', showNextImage);
-    prevButton.addEventListener('click', showPrevImage);
-
-    // stop auto play on hover 
-    sliderWrapper.addEventListener('mouseenter', stopAutoPlay);
-    sliderWrapper.addEventListener('mouseleave', startAutoPlay);
-
-    // intialization
-    createPaginationDots(); // create dots based on number of images
-    updateSliderPosition(); // set initial position (should be 0%)
-    startAutoPlay();
 
     // Zoom In JS
     const zoomElements = document.querySelectorAll('.zoom-in');
