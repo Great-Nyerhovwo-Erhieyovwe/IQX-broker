@@ -11,7 +11,7 @@ body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
     font-size: 16px;
     /* background: linear-gradient(135deg, #007AFF, #5E5CE6, #FF2D55); */
-    background: linear-gradient(120deg, green, Grey, red);
+    background: linear-gradient(180deg, #000000 0%, #030C2E 100%);
     background-size: 300% 300%;
     animation: gradientBG 12s ease infinite;
     display: flex;

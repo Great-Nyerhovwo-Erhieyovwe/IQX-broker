@@ -25,7 +25,7 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Poppins", sans-serif;
     line-height: 1.6;
     /* background: linear-gradient(120deg, #007AFF, #5E5CE6, #FF2D55); */
-    background: linear-gradient(120deg, #596d9a, #a3aac1, #65b998);
+    background: linear-gradient(180deg, #000000 0%, #030C2E 100%);
     background-size: 200% 200%;
     animation: bgMove 18s ease infinite;
     color: var(--text-primary);
