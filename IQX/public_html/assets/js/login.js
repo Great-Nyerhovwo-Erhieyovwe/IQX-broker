@@ -107,18 +107,24 @@ document.addEventListener('DOMContentLoaded', () => {
         else sessionStorage.setItem('supabaseSession', JSON.stringify(sessionData));
 
         // Check banned status in "users" table
-        const { data: profile, error: profileError } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-        if (profileError) throw profileError;
+       const { data: profile, error: profileError } = await supabase
+  .from('users')
+  .select('*')
+  .eq('id', user.id)
+  .maybeSingle();  // <-- change here
 
-        if (profile?.is_banned) {
-          showModal('Access Denied', 'Your account is banned.', true);
-          await supabase.auth.signOut();
-          return;
-        }
+if (profileError) throw profileError;
+
+if (!profile) {
+  showModal('Login Failed', 'User profile not found. Please complete registration.', true);
+  return;
+}
+
+if (profile.is_banned) {
+  showModal('Access Denied', 'Your account is banned.', true);
+  await supabase.auth.signOut();
+  return;
+}
 
         showModal('Success', `Welcome back, ${profile?.username || email}!`, false);
         setTimeout(() => window.location.href = '../dashboard/dashboard.html', 1500);
