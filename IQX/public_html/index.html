@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> IQX Broker | Home</title>
+
+    <!-- favicon -->
+    <link rel="stylesheet" href="../public_html/assets/images/cboe_header_logo.jpg">
+
+    <!-- custom CSS -->
+    <link rel="stylesheet" href="./assets/css/main.css">
+    <!-- google fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <!-- font awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <style>
+        /* Hide widget on desktop (≥ 769px) */
+        @media (min-width: 769px) {
+            .mobile-only {
+                display: none !important;
+            }
+        }
+    </style>
+
+
+</head>
+
+<body>
+    <div id="alertOverlay">
+        <div id="alertBox">
+            <span>Notice: All trades placed and investments are 100% secured so traders should be 100% confident as
+                there will be always success in trade</span>
+            <button onclick="document.getElementById('alertOverlay').style.display='none'"
+                id="closeAlertBtn">&times;</button>
+        </div>
+    </div>
+    <!-- infinite scroll -->
+    <div class="scrolling-text-container">
+        <div class="scrolling-text">
+            Welcome to IQX Broker | Market Open: 9:30 AM ET | SPX Index Options at Record High | IQ5 Expands
+            into Digital Assets | Trade with Confidence on Cboe | Real-Time Market Data & Analytics | Discover IQX
+            Global Derivatives | Register to get Started.
+        </div>
+    </div>
+
+
+    <!-- nav -->
+    <nav>
+        <div class="logo"><img src="../public_html/assets/images/cboe_logo_inv_50th-footer.svg" alt="IQX logo"></div>
+        <!-- <div class="logo"><img src="../public_html/assets/images/cboe_header_logo.jpg" alt="cboe logo"></div> -->
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#cboe">About</a></li>
+            <li><a href="#service">Services</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li><a href="./login/login.html">Login</a></li>
+        </ul>
+
+        <div class="hamburger" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="fas fa-bars"></i>
+        </div>
+    </nav>
+
+    <!-- header -->
+    <header class="header" id="vanta-globe">
+        <!-- <video autoplay muted loop playsinline class="header-video">
+            <source src="./assets/images/main_bg.mp4" type="video/mp4">
+        </video> -->
+        <div class="text-content">
+            <h4 class="text-primary">The Exchange For The World Stage, Empowering Your Financial Future with Smarter
+                Investments....</span></h4> <br> <br>
+
+
+            <h1>Join <span class="text-primary">IQX Broker</span> - Your Trusted Platform for Forex and Crypto
+                Trading</h1>
+            <p>
+                At IQX, we provide the tools, knowledge, and market access you need to navigate today's dynamic
+                financial landscape. From foundational education to advanced trading and investment solutions, we're
+                here to support your journey every step of the way.
+            </p>
+            <a href="./register/register.html">Get Started Now</a>
+
+            <div class="boxes">
+                <div class="box">
+                    <div class="icon">
+                        <i class="fa-solid fa-globe"></i>
+                    </div>
+                    <div class="number">80+</div>
+                    <p>Country Served</p>
+                </div>
+                <div class="box">
+                    <div class="icon">
+                        <i class="fa-solid fa-certificate"></i>
+                    </div>
+                    <div class="number">100k+</div>
+                    <p>Verified Accounts</p>
+                </div>
+                <div class="box">
+                    <div class="icon">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <div class="number">380k+</div>
+                    <p>Registered Users</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TradingView Widget BEGIN -->
+        <div class="tradingview-widget-container">
+            <div class="tradingview-widget-container__widget"></div>
+            <script type="text/javascript"
+                src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+                    {
+                        "symbols": [
+                            { "proName": "FOREXCOM:SPXUSD", "title": "S&P 500 Index" },
+                            { "proName": "FOREXCOM:NSXUSD", "title": "US 100 Cash CFD" },
+                            { "proName": "FX_IDC:EURUSD", "title": "EUR to USD" },
+                            { "proName": "BITSTAMP:BTCUSD", "title": "Bitcoin" },
+                            { "proName": "BITSTAMP:ETHUSD", "title": "Ethereum" }
+                        ],
+                            "colorTheme": "dark",
+                                "locale": "en",
+                                    "isTransparent": true,   /* transparent background */
+                                        "showSymbolLogo": true,
+                                            "displayMode": "adaptive",
+                                                "width": "100%",         /* auto-fit container */
+                                                    "height": 60             /* fixed height */
+                    }
+                </script>
+        </div>
+        <!-- TradingView Widget END -->
+
+    </header>
+
+
+
+    <!-- popup -->
+    <div id="popup-container"></div>
+
+    <!-- Image Slider -->
+    <div class="slider-container">
+        <div class="slider-wrapper">
+            <img src="./assets/images/defimikesotero-20250927-0002.jpg" alt="Image 1">
+            <img src="./assets/images/big-russell-photo.jpg" alt="Image 2">
+            <img src="./assets/images/card-markets-header.jpg" alt="Image 3">
+            <img src="./assets/images/cash-equities-photo.png" alt="Image 4">
+            <img src="./assets/images/notable-trades-photo.jpg" alt="Image 5">
+        </div>
+
+        <button class="nav-button prev-button">&#10094;</button> <button
+            class="nav-button next-button">&#10095;</button>
+        <div class="pagination-dots"></div>
+    </div>
+    <hr>
+
+    <!-- newsletter -->
+    <section id="newsletter" class="container">
+        <h4><strong>NOTIFY ME OF NEW TRADES</strong></h4>
+        <div class="newsletter-form">
+            <form action="">
+                <input type="email" name="subscribe" id="email" placeholder="Email">
+                <button type="submit">NOTIFY ME</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- why choose us -->
+    <section class="container" id="latest">
+        <h2>Why Partner with<span class="text-primary"> IQX?</span></h2>
+        <div class="courses">
+            <div class="course zoom-in">
+                <div class="course-hours">
+                    <div class="course-logo">
+                        <img src="./assets/images/card-listings-header.jpg" alt="course-logo">
+                    </div>
+                </div>
+                <div class="level">
+                    Global Reach
+                </div>
+                <p><strong>80+ Countries Served</strong></p>
+                <p>Traders across the globe trust our platform</p>
+                <p>We connect markets worldwide for seamless trading.</p>
+                <div class="cart">
+                    <a href="./register/register.html">Get Started Now</a>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </div>
+
+            <div class="course zoom-in">
+                <div class="course-hours">
+                    <div class="course-logo">
+                        <img src="./assets/images/card-listings-header.jpg" class="courselogo" alt="course-logo">
+                    </div>
+                </div>
+                <div class="level">
+                    Registered fa-users
+                </div>
+                <p><strong>380k+ Registered Traders</strong></p>
+                <p>Join a fast-growing community of investors</p>
+                <p>Thousands join us every month to grow their portfolio.</p>
+                <div class="cart">
+                    <a href="./register/register.html">Get Started Now</a>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </div>
+
+            <div class="course zoom-in">
+                <div class="course-hours">
+                    <div class="course-logo">
+                        <img src="./assets/images/card-listings-header.jpg" alt="course-logo">
+                    </div>
+                </div>
+                <div class="level">
+                    Deposits and Withdrawals
+                </div>
+                <p><strong>Various deposits options and fast withdrawal of funds. The minimum deposit is only
+                        $100.</strong></p>
+                <div class="cart">
+                    <a href="./register/register.html">Start Trading Now</a>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </div>
+
+            <div class="course zoom-in">
+                <div class="course-hours">
+                    <div class="course-logo">
+                        <img src="./assets/images/card-listings-header.jpg" alt="course-logo">
+                    </div>
+                </div>
+                <div class="level">
+                    Trades Executed
+                </div>
+                <p><strong>8M+ Orders Processed</strong></p>
+                <p>Fast and reliable trade execution at scale</p>
+                <p>Our trading engine handles high-frequency orders daily.</p>
+                <div class="cart">
+                    <a href="./register/register.html">Get Started Now</a>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </div>
+
+            <div class="course zoom-in">
+                <div class="course-hours">
+                    <div class="course-logo">
+                        <img src="./assets/images/card-listings-header.jpg" class="courselogo" alt="course-logo">
+                    </div>
+                </div>
+                <div class="level">
+                    Verified Accounts
+                </div>
+                <p><strong>100k+ KYC-Verified Users</strong></p>
+                <p>Regulatory compliance for safe trading</p>
+                <p>We take your security and data protection seriously.</p>
+                <div class="cart">
+                    <a href="./register/register.html">Get Started Now</a>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </div>
+
+            <div class="course zoom-in">
+                <div class="course-hours">
+                    <div class="course-logo">
+                        <img src="./assets/images/card-listings-header.jpg" alt="course-logo">
+                    </div>
+                </div>
+                <div class="level">
+                    Active Traders Now
+                </div>
+                <p><strong>10,000+ Active Traders</strong></p>
+                <p>Engage in real-time with global markets</p>
+                <p>Thousands trading live at this moment.
+                </p>
+                <div class="cart">
+                    <a href="./register/register.html">Get Started Now</a>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </div>
+
+            <div class="course zoom-in">
+                <div class="course-hours">
+                    <div class="course-logo">
+                        <img src="./assets/images/card-listings-header.jpg" alt="course-logo">
+                    </div>
+                </div>
+                <div class="level">
+                    Uptime & Speed
+                </div>
+                <p><strong>99.99% Uptime Guarantee</strong></p>
+                <p>Reliable infrastructure built for traders</p>
+                <p>Your trades are safe on our stable platform.</p>
+                <div class="cart">
+                    <a href="./register/register.html">Get Started Now</a>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </div>
+
+            <div class="course zoom-in">
+                <div class="course-hours">
+                    <div class="course-logo">
+                        <img src="./assets/images/card-listings-header.jpg" alt="course-logo">
+                    </div>
+                </div>
+                <div class="level">
+                    Client Satisfaction
+                </div>
+                <p><strong>24/7 Live Support</strong></p>
+                <p>Our experts are here whenever you need us</p>
+                <p>Get real-time help via chat, email, or phone.</p>
+                <div class="cart">
+                    <a href="./register/register.html">Get Started Now</a>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </div>
+
+            <div class="course zoom-in">
+                <div class="course-hours">
+                    <div class="course-logo">
+                        <img src="./assets/images/card-listings-header.jpg" alt="course-logo">
+                    </div>
+                </div>
+                <div class="level">
+                    Traders Ratings
+                </div>
+                <p><strong>4.5/8 Average Rating</strong></p>
+                <p>Rated by thousands of happy traders</p>
+                <p>What our users says reflects our commitment to excellence.</p>
+                <div class="cart">
+                    <a href="./register/register.html">Get Started Now</a>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </div>
+
+    </section>
+
+    <!-- join Courses -->
+    <section id="service">
+        <div id="join-courses" class="zoom-in">
+            <h2>Start Your Financial Journey with Confidence</h2>
+            <p>Explore tailored soluctions for every level - whether you're learning the basics, trading the markets, or
+                Investing for long-term growth, we provide the tools, support, and technology to help you succeed.</p>
+
+            <div class="course-card">
+                <div class="card-learn zoom-in">
+                    <h4><strong>Learn</strong></h4>
+                    <p>KNOWLEDGE TO GET STARTED</p>
+                    <ul>
+                        <li><span>✔ </span>FREE Demo Account</li>
+                        <li><span>✔ </span>Step-by-step tutorials & articles</li>
+                        <li><span>✔ </span>Online Webinars & local seminars</li>
+                        <li><span>✔ </span>Your own Account Manager</li>
+                        <li><span>✔ </span>Educational quizzes & learning progress tracker</li>
+                        <li><span>✔ </span>Glossary of trading terms & chart basics</li>
+                        <li><span>✔ </span>Access to trader community forums</li>
+                    </ul>
+                    <button onclick="(location.href='./register/register.html')">Open Account</button>
+                </div>
+
+                <div class="card-trade zoom-in">
+                    <h4><strong>Trade</strong></h4>
+                    <p>TAKE YOUR FIRST PROFIT</p>
+                    <ul>
+                        <li><span>✔ </span> Tight spreads</li>
+                        <li><span>✔ </span> Superfast trade execution</li>
+                        <li><span>✔ </span> Hi-tech forex trading tools</li>
+                        <li><span>✔ </span> Ultimate risk protection & security</li>
+                        <li><span>✔ </span> Multi-asset trading platform</li>
+                        <li><span>✔ </span> Real-time news & market alerts</li>
+                        <li><span>✔ </span> 24/5 customer support</li>
+                        <li><span>✔ </span> Risk-free: 15 Days Refund Period</p>
+                        </li>
+
+                    </ul>
+                    <button onclick="(location.href='./register/register.html')">Open Account</button>
+                </div>
+
+                <div class="card-invest zoom-in">
+                    <h4><strong>Invest</strong></h4>
+                    <p>CHOOSE THE BEST PORTFOLIO</p>
+                    <ul>
+                        <li><span>✔ </span> No trading experience required</li>
+                        <li><span>✔ </span> Large number of strategies</li>
+                        <li><span>✔ </span> Profit whenever Manager earn</li>
+                        <li><span>✔ </span> Full control of your investment</li>
+                        <li><span>✔ </span> Automatic portfolio management</li>
+                        <li><span>✔ </span> Transparent performance reports</li>
+                        <li><span>✔ </span> Risk management & stop loss tools</li>
+                        <li><span>✔ </span> Priority Support</p>
+                        </li>
+                    </ul>
+                    <button onclick="(location.href='./register/register.html')">Open Account</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TradingView Widget BEGIN -->
+    <div class="tradingview-widget-container mobile-only">
+        <div class="tradingview-widget-container__widget"></div>
+        <a href="https://www.tradingview.com/markets/currencies/" rel="noopener nofollow" target="_blank">
+            <span class="blue-text"></span>
+        </a>
+        <span class="trademark"></span>
+        <script type="text/javascript"
+            src="https://s3.tradingview.com/external-embedding/embed-widget-forex-cross-rates.js" async>
+                {
+                    "colorTheme": "dark",
+                        "isTransparent": true,
+                            "locale": "en",
+                                "currencies": [
+                                    "EUR", "USD", "JPY", "GBP", "CHF", "AUD", "CAD", "NZD", "CNY"
+                                ],
+                                    "backgroundColor": "#0F0F0F",
+                                        "width": "100%",   /* ✅ auto-resizes on mobile */
+                                            "height": 400
+                }
+            </script>
+    </div>
+    <!-- TradingView Widget END -->
+
+    <!-- account type -->
+    <section id="accounttype-form" class="zoom-in">
+        <!-- Description -->
+        <div class="accounttype-description">
+            <p>Choose from a range of investment strategies based on your risk profile and goals.</p>
+        </div>
+
+        <form class="dd-form">
+            <div class="form-group">
+                <label for="accountType"><i class="fas fa-building"></i> Account Type:</label>
+                <select name="accountType" id="accountType">
+                    <option value="" disabled selected>-- Select Account Type --</option>
+                    <option value="co">Co (Company Investment Account)</option>
+                    <option value="mini">Mini Account</option>
+                    <option value="standard">Standard Account</option>
+                    <option value="platinum">Platinum Account</option>
+                    <option value="premium">Premium Account</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="startupAmount"><i class="fas fa-dollar=sign"></i> Startup Amount (USD):</label>
+                <select name="startupAmount" id="startupAmount">
+                    <option value="" disabled selected>-- Enter Amount --</option>
+                    <option value="100-500">$100 - $500</option>
+                    <option value="500-2000">$500 - $2,000</option>
+                    <option value="1000-5000">$1000 - $5000</option>
+                    <option value="10000plus">$10,000+</option>
+                </select>
+            </div>
+
+            <button type="submit">Start Investing</button>
+        </form>
+    </section>
+
+
+    <!-- about cboe -->
+    <section id="cboe" class="zoom-in">
+        <h2>What is <span> IQX Broker</span> and what does it offers?</h2>
+        <div class="abt-cboe-image">
+            <img src="./assets/images/cboe_logo_inv_50th-footer.svg" alt="Cboe logo Image">
+        </div>
+        <div class="abt-cboe">
+            <div class="about-cboe zoom-in">
+                <p>IQX Broker, is one of the world's largest exchange holding companies, providing
+                    cutting-edge trading and investment soluctions across a diverse range of asset classes, including
+                    equities, derivatives, FX, and digital assets. </p>
+
+                <h4><strong>Founded: </strong> 2007 (as the Innovative Quotex Xchange Broker)</h4>
+
+                <h4><strong>Headquarters: </strong> Miami, Florida, USA</h4>
+            </div>
+            <div class="what-cboe-does zoom-in">
+                <h2>What <span>IQX</span> Does:</h2>
+                <ul>
+                    <li><strong>Options Trading</strong></li>
+                    <li><strong>Equities Trading</strong></li>
+                    <li><strong>Global Derivatives</strong></li>
+                    <li><strong>Cboe Votality Index(VIX)</strong></li>
+                    <li><strong>Foreign Exchange (FX)</strong></li>
+                    <li><strong>Digital Assets</strong></li>
+                    <li><strong>Market Data & Analytics</strong></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- testiony section -->
+    <div class="testimony-container">
+        <div class="testimonial-card jason zoom-in">
+            <div class="testimonial-info">
+                <div class="testimonial-img">
+                    <img src="./assets/images/jasonM_img.jpg" alt="">
+                </div>
+                <div class="others">
+                    <h4>Jason M.</h4>
+                    <p>Retailer Investor</p>
+                </div>
+            </div>
+            <div class="testimonial-text">
+                <p>
+                    "I started with a small investment just to test things out, and I was pleasantly surprised by how
+                    smooth everything was. The returns have been steady, and I feel more confident managing my finances
+                    thanks to IQX."
+                </p>
+            </div>
+        </div>
+        <div class="testimonial-card linda zoom-in">
+            <div class="testimonial-info">
+                <div class="testimonial-img">
+                    <img src="./assets/images/lindiaO_img.jpg" alt="">
+                </div>
+                <div class="others">
+                    <h4>Linda O.</h4>
+                    <p>Individual Investor</p>
+                </div>
+            </div>
+            <div class="testimonial-text">
+                <p>
+                    "IQX has completely changed how I view investing. The platform is easy to use, and I've been able
+                    to grow my portfolio consistently. It feels great to finally see profits coming in."
+                </p>
+            </div>
+        </div>
+        <div class="testimonial-card nathan zoom-in">
+            <div class="testimonial-info">
+                <div class="testimonial-img">
+                    <img src="./assets/images/NathanR_img.jpg" alt="">
+                </div>
+                <div class="others">
+                    <h4>Nathan R.</h4>
+                    <p>First-Time Investors</p>
+                </div>
+            </div>
+            <div class="testimonial-text">
+                <p>
+                    "Before IQX, I was nervous about investing. But the platform maade it simple, and now I've started
+                    seeing real profits. I even re-ivest my earnings, and it's been a smart move"
+                </p>
+            </div>
+        </div>
+        <div class="testimonial-card emily zoom-in">
+            <div class="testimonial-info">
+                <div class="testimonial-img">
+                    <img src="./assets/images/emilyT_img.jpg" alt="">
+                </div>
+                <div class="others">
+                    <h4>Emily T.</h4>
+                    <p>Everyday Investor</p>
+                </div>
+            </div>
+            <div class="testimonial-text">
+                <p>
+                    "I don't have a financial background, but with IQX, I didn't need one. I started small and now I've
+                    made enough profits to help pay off some bills and put money aside for the future."
+                </p>
+            </div>
+        </div>
+        <div class="testimonial-card derek zoom-in">
+            <div class="testimonial-info">
+                <div class="testimonial-img">
+                    <img src="./assets/images/derek_img.jpg" alt="">
+                </div>
+                <div class="others">
+                    <h4>Derek S.</h4>
+                    <p>Side Income Investor</p>
+                </div>
+            </div>
+            <div class="testimonial-text">
+                <p>
+                    "Investing with IQX has been one of the best financial decisions I've made. My account grows
+                    steadily, and I always know what's happening thanks to their transparent reporting."
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ -->
+    <section class="faq zoom-in">
+        <h2>Frequently Asked Questions</h2>
+
+        <div class="faq-item">
+            <button class="question">
+                What is IQX and how is it related to trading?
+            </button>
+            <div class="answer">
+                IQX (Intelligent Quotex Xchange) is one of the world's largest options exchanges. It offers a
+                platform where traders can buy and sell derivatives, including options, futures, and products related to
+                global markets.
+            </div>
+        </div>
+
+
+        <div class="faq-item">
+            <button class="question">
+                Can I trade Forex on IQX?
+            </button>
+            <div class="answer">
+                Yes, IQX offers forex-related derivatives such as FX options and futures through IQ5 FX and affiliated
+                platforms.
+            </div>
+        </div>
+
+
+        <div class="faq-item">
+            <button class="question">
+                What is Forex trading?
+            </button>
+            <div class="answer">
+                Forex trading involves the exchange of one currency for another to profit from price movements. It is
+                the largest financial market globally, operating 24/5 with a daily volume of over $6 trillion.
+            </div>
+        </div>
+
+
+        <div class="faq-item">
+            <button class="question">
+                How do I start trading on IQX?
+            </button>
+            <div class="answer">
+                Register for a trading account, Choose an account type that matches your needs and experience in terms
+                of tools, fees and support.
+            </div>
+        </div>
+
+
+        <div class="faq-item">
+            <button class="question">
+                Do I need any special experience to get started?
+            </button>
+            <div class="answer">
+                Not at all. With the right guidance or a relaible signal provider, even beginners can get started easily
+                and follow proven strategies.
+            </div>
+        </div>
+
+
+        <div class="faq-item">
+            <button class="question">
+                Can I earn consistent income through this?
+            </button>
+            <div class="answer">
+                Yes, many traders generate daily or weekly income by following market trends or copying experienced
+                traders - especially when guided by active trading signals.
+            </div>
+        </div>
+
+
+        <div class="faq-item">
+            <button class="question">
+                Is there any risk involved?
+            </button>
+            <div class="answer">
+                No, With our proven trading bot and real-time community guidance, every trade is strategically managed
+                to protect your capital and deliver consistent results.
+            </div>
+        </div>
+
+
+        <div class="faq-item">
+            <button class="question">
+                Is IQX trading suitable for beginners?
+            </button>
+            <div class="answer">
+                Yes, No experience is needed. Just signup, follow the bot and community insights, and watch your
+                portfolio grow over time.
+            </div>
+        </div>
+    </section>
+
+
+    <!-- cboe YouTube  -->
+    <section id="cboe-youtube" class="zoom-in">
+        <div class="cboemedia-youtube">
+            <div class="cboe-youtube-image">
+                <img src="./assets/images/cboe_exchange_footer_logo.png" alt="Cboe Global Market Youtube">
+            </div>
+            <div class="cboe-on-youtube">
+                <h2>Cboe Global Markets on YouTube</h2>
+                <p>Our YouTube channel features <strong>market insights, trading tutorials </strong> , and interviews
+                    with industry leaders. Join over<strong> 80,000 subscribers</strong> and explore <strong> hundreds
+                        of videos</strong> covering market analysis, options education, and platform walkthroughs.</p>
+                <button>VIEW CHANNEL</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- footer -->
+    <footer id="contact" class="footer">
+        <h2></h2>
+        <p>Want a guide on how to start a trade? Let's talk.</p>
+        <ul class="contact-list">
+            <li><strong>Email:</strong> IQX@proton.me</li>
+            <li><strong>Phone:</strong> +1 502-020-8471</li>
+            <li><strong>Location:</strong> (Updated soon!)</li>
+        </ul>
+        <div class="container">
+            <p>&copy;2025 IQX Broker. All Right Reserved</p>
+
+            <div class="cboe-on-sociamedia">
+                <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#"><i class="fa-brands fa-tiktok"></i></a>
+                <a href="#"><i class="fa-brands fa-youtube"></i></a>
+                <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
+                <a href=""><i class="fa-telegram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+
+    <button id="backToTop"><i class="fa-solid fa-arrow-up"></i> Back to Top</button>
+    <!-- js -->
+    <!-- <script>
+        const toogler = document.querySelector('.toogler');
+        const navLinks = document.querySelector('.nav-links');
+
+        toogler.addEventListener('click', () => {
+            navLinks.classList.toggle('show');
+        });
+    </script> -->
+
+    <!--Start of Tawk.to Script-->
+    <script type="text/javascript">
+        var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
+        (function () {
+            var s1 = document.createElement("script"), s0 = document.getElementsByTagName("script")[0];
+            s1.async = true;
+            s1.src = 'https://embed.tawk.to/68d6f1db2f0308195286dcca/1j63q1gsl';
+            s1.charset = 'UTF-8';
+            s1.setAttribute('crossorigin', '*');
+            s0.parentNode.insertBefore(s1, s0);
+        })();
+    </script>
+    <!--End of Tawk.to Script-->
+
+    <!-- FAQ JS -->
+    <script>
+        document.querySelectorAll('.question').forEach(function (question) {
+            question.addEventListener('click', function () {
+                // close all answer first
+                document.querySelectorAll('.question').forEach(function (q) {
+                    if (q !== question) {
+                        q.classList.remove('active');
+                        q.nextElementSibling.style.display = 'none';
+                    }
+                });
+
+                // then toogle this one
+                if (question.classList.contains('active')) {
+                    question.classList.remove('active');
+                    question.nextElementSibling.style.display = 'none';
+                } else {
+                    question.classList.add('active');
+                    question.nextElementSibling.style.display = 'block';
+                }
+            });
+        });
+    </script>
+
+    <!-- Vanta js globe header background CDN & Script-->
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+     <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
+     <script>
+        VANTA.GLOBE({
+            el: "#vanta-globe",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: true,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            color: 0x00ffff,
+            color2: 0x0055ff,
+            backgroundColor: 0x000015,
+        })
+     </script>
+    <script src="./assets/js/main.js"></script>
+</body>
+
+</html>

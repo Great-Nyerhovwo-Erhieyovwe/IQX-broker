@@ -1,0 +1,332 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+    font-size: 16px;
+    /* background: linear-gradient(135deg, #007AFF, #5E5CE6, #FF2D55); */
+    background: linear-gradient(120deg, green, Grey, red);
+    background-size: 300% 300%;
+    animation: gradientBG 12s ease infinite;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 110vh;
+    margin: 0;
+    padding: 1rem;
+    color: white;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Glass container */
+.container {
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 2.5rem;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 500px;
+    box-sizing: border-box;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    text-align: center;
+    color: white;
+    margin-bottom: 30px;
+    font-weight: 700;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.form-group {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+select {
+    display: flex;
+    padding: 14px 16px;
+    width: 100%;
+    height: 3.2rem;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='rgba(255,255,255,0.7)'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 16px;
+}
+
+select:focus {
+    outline: none;
+    border-color: rgba(100, 210, 255, 0.6);
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 0 3px rgba(100, 210, 255, 0.3);
+}
+
+.feedback {
+    font-size: 12px;
+    margin-top: 4px;
+    color: #FF3B30;
+}
+
+.feedback.valid {
+    color: #34C759;
+}
+
+.suggestion-list {
+    list-style: none;
+    margin: 4px 0 0 0;
+    padding: 0;
+    background: rgba(30, 30, 46, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    max-height: 100px;
+    overflow-y: auto;
+    display: none;
+    position: absolute;
+    width: 100%;
+    z-index: 10;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.suggestion-list li {
+    padding: 10px 14px;
+    cursor: pointer;
+    color: white;
+    transition: background 0.2s ease;
+}
+
+.suggestion-list li:hover {
+    background-color: rgba(100, 210, 255, 0.3);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="password"] {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 14px;
+    font-size: 16px;
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+input[type="password"]:focus {
+    outline: none;
+    border-color: rgba(100, 210, 255, 0.6);
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 0 3px rgba(100, 210, 255, 0.3);
+}
+
+input.invalid {
+    border-color: #FF3B30;
+}
+
+input.valid {
+    border-color: #34C759;
+}
+
+/* Checkbox styling */
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 0.6rem;
+    margin-right: 12px;
+    transform: scale(1.4);
+    accent-color: #007AFF;
+    cursor: pointer;
+}
+
+.checkbox-group label {
+    margin-bottom: 0;
+    display: inline-block;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.checkbox-group a {
+    text-decoration: none;
+    color: #64D2FF;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.checkbox-group a:hover {
+    text-decoration: underline;
+}
+
+#have-account {
+    padding: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    text-align: center;
+}
+
+#have-account a {
+    transform: scale(1.1);
+    transition: transform 0.3s ease, color 0.2s ease;
+    text-decoration: none;
+    color: #64D2FF;
+    font-weight: 500;
+}
+
+#have-account a:hover {
+    text-decoration: underline;
+    transform: scale(1.12);
+}
+
+/* password strength indicator */
+.password-strength-indicator {
+    display: none;
+    height: 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    margin-top: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.strength-bar {
+    height: 100%;
+    width: 0%;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out;
+}
+
+.strength-bar.weak {
+    background-color: #FF3B30; /* Red for weak */
+}
+
+.strength-bar.moderate {
+    background-color: #FF9500; /* Orange for moderate (iOS style) */
+}
+
+.strength-bar.strong {
+    background-color: #34C759; /* Green for strong (iOS style) */
+}
+
+.strengthText {
+    font-size: 0.85em;
+    margin-top: 5px;
+    text-align: right;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+button {
+    width: 100%;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 16px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.45);
+}
+
+.modal-content {
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 20px;
+    width: 80%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    color: white;
+    height: auto;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.close {
+    color: rgba(255, 255, 255, 0.7);
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.close:hover,
+.close:focus {
+    color: white;
+    text-decoration: none;
+}
