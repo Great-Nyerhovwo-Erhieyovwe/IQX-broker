@@ -8,57 +8,6 @@
     <link rel="stylesheet" href="../assets/css/dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
-    <script type="module">
-        // Import the necessary Firebase SDKs
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-        // Your web app's Firebase configuration (REPLACE WITH YOUR ACTUAL CONFIG IF DIFFERENT)
-        const firebaseConfig = {
-            apiKey: "AIzaSyBTGdLyfpv9xzmh5hYoctay0Ev4W4lpAjM",
-            authDomain: "cboefirebaseserver.firebaseapp.com",
-            databaseURL: "https://cboefirebaseserver-default-rtdb.firebaseio.com",
-            projectId: "cboefirebaseserver",
-            storageBucket: "cboefirebaseserver.firebasestorage.app",
-            messagingSenderId: "755491003217",
-            appId: "1:755491003217:web:2a10ffad1f38c9942f5170",
-            measurementId: "G-FCZEERNC06"
-        };
-
-        // Initialize Firebase and Services
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-
-        // Make core services accessible to other script modules
-        window.firebaseApp = app;
-        window.db = db;
-        window.auth = auth;
-
-        // 🛑 AUTHENTICATION REDIRECT CHECK 🛑
-        onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                // User is not signed in, redirect to login page
-                console.log("No user signed in. Redirecting to login.");
-                window.location.replace("../login/login.html");
-            } else {
-                console.log(`User ${user.uid} is signed in.`);
-                window.currentUser = user; // Store the user object globally for data fetching
-            }
-        });
-
-        // 🛑 LOGOUT HANDLER 🛑
-        window.handleLogout = async () => {
-            try {
-                await signOut(auth);
-                // The onAuthStateChanged listener handles the redirection after sign out
-            } catch (error) {
-                console.error("Logout failed:", error);
-                alert("Logout failed. Please try again.");
-            }
-        };
-    </script>
     </head>
 
 <body class="light-mode">
@@ -170,9 +119,9 @@
 
     <div id="mobile-overlay" class="mobile-overlay hidden"></div>
     
-       <script type="module" src="./firebase-config.js"></script> 
+      <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <script type="module" src="../assets/js/deposit.js"></script>
+    <script src="../assets/js/deposit.js"></script>
 </body>
 
 </html>
