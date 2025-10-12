@@ -7,31 +7,6 @@
   <link rel="stylesheet" href="../assets/css/register.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
-  <!-- ✅ GLOBAL FIREBASE SDK (MUST USE THESE EXACT VERSIONS) -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-  
-  <script>
-    // ✅ PASTE YOUR ACTUAL CONFIG FROM FIREBASE CONSOLE
-    const firebaseConfig = {
-      apiKey: "AIzaSyBTGdLyfpv9xzmh5hYoctay0Ev4W4lpAjM",
-      authDomain: "cboefirebaseserver.firebaseapp.com",
-      projectId: "cboefirebaseserver",
-      storageBucket: "cboefirebaseserver.firebasestorage.app",
-      messagingSenderId: "755491003217",
-      appId: "1:755491003217:web:2a10ffad1f38c9942f5170"
-    };
-
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    
-    // Make globally available
-    window.auth = firebase.auth();
-    window.db = firebase.firestore();
-    
-    console.log("Firebase initialized successfully");
-  </script>
 </head>
 
 <body>
@@ -114,7 +89,7 @@
                     <option value="RUB">RUB - Russian Ruble</option>
                     <option value="ZAR">ZAR - South African Rand</option>
                     <option value="INR">INR - Indian Rupee</option>
-                    <option value="MXN">MXN - Mexican Peso</option> <!-- ✅ FIXED: Typo "Mexicon" -->
+                    <option value="MXN">MXN - Mexican Peso</option>
                     <option value="PHP">PHP - Philippine Peso</option>
                     <option value="KZT">KZT - Kazakhstan Tenge</option>
                     <option value="Others">Others</option>

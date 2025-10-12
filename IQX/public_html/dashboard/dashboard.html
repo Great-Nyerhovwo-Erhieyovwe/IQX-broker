@@ -9,47 +9,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css"
         integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
-        
-    <script type="module">
-  // Import Firebase SDKs
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  // Firebase config
-  const firebaseConfig = {
-    apiKey: "AIzaSyBTGdLyfpv9xzmh5hYoctay0Ev4W4lpAjM",
-    authDomain: "cboefirebaseserver.firebaseapp.com",
-    projectId: "cboefirebaseserver",
-    storageBucket: "cboefirebaseserver.firebasestorage.app",
-    messagingSenderId: "755491003217",
-    appId: "1:755491003217:web:2a10ffad1f38c9942f5170"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-
-  // Handle auth state
-  onAuthStateChanged(auth, (user) => {
-    if (!user) {
-      window.location.replace("../login/login.html");
-    }
-  });
-
-  // Make available to dashboard.js
-  window.firebaseApp = app;
-  window.auth = auth;
-  window.db = db;
-
-  // Logout function
-  window.handleLogout = async () => {
-    await signOut(auth);
-    window.location.replace("../login/login.html");
-  };
-</script>
-    </head>
+</head>
 
 <body class="light-mode">
     <div id="dashboard-container">
@@ -62,12 +23,14 @@
                     <li><a href="#" class="active"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
                     <li><a href="market.html"><i class="fa-solid fa-chart-line"></i><span>Market & Pairs</span></a></li>
                     <li><a href="trade.html"><i class="fa-solid fa-money-bill-trend-up"></i><span>Trade</span></a></li>
-                    <li><a href="deposit.html"><i class="fa-solid fa-money-bill-transfer"></i><span>Deposit</span></a></li>
+                    <li><a href="deposit.html"><i class="fa-solid fa-money-bill-transfer"></i><span>Deposit</span></a>
+                    </li>
                     <li><a href="#"><i class="fas arrow-up"></i><span>Withdraw</span></a></li>
 
                     <li><a href="settings.html"><i class="fa-solid fa-user-gear"></i><span>Settings</span></a></li>
                     <li><a href="support.html"><i class="fa-solid fa-ticket"></i><span>Support</span></a></li>
-                    <li><a href="javascript:void(0);" onclick="handleLogout();"><i class="fa-solid fa-arrow-left"></i><span>Logout</span></a></li>
+                    <li><a href="javascript:void(0);" onclick="handleLogout();"><i
+                                class="fa-solid fa-arrow-left"></i><span>Logout</span></a></li>
                 </ul>
             </nav>
             <div class="sidebar-footer">
@@ -164,7 +127,7 @@
                     </div>
 
                     <div class="card empty-card">
-                        </div>
+                    </div>
 
                     <div class="card flexible3">
                         <div class="card-info">
@@ -174,7 +137,7 @@
                     </div>
 
                 </section>
-                </main>
+            </main>
         </div>
     </div>
 
@@ -197,17 +160,14 @@
             </select>
 
             <label>Deposit Wallet Address</label>
-            <p id="walletAddressDisplay" style="font-weight: bold; padding: 5px; border: 1px dashed #555; background-color: #333; word-break: break-all;">
+            <p id="walletAddressDisplay"
+                style="font-weight: bold; padding: 5px; border: 1px dashed #555; background-color: #333; word-break: break-all;">
                 1P5N....hJvA
             </p>
 
             <div id="qrCodeContainer" style="text-align: center; margin: 15px 0;">
-                <img
-                    id="qrCodeImage"
-                    src="../assets/IMG_3817.png"
-                    alt="Deposit QR Code"
-                    style="width: 150px; height: 150px; border: 1px solid #444; border-radius: 8px; padding: 5px;"
-                >
+                <img id="qrCodeImage" src="../assets/IMG_3817.png" alt="Deposit QR Code"
+                    style="width: 150px; height: 150px; border: 1px solid #444; border-radius: 8px; padding: 5px;">
                 <p style="font-size: 0.8em; color: #888;">Scan to deposit.</p>
             </div>
 
@@ -248,7 +208,7 @@
     <div id="mobile-overlay" class="mobile-overlay hidden"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <!--  <script type="module" src="./firebase-config.js"></script> -->
+    <!--  <script type="module" src="./firebase-config.js"></script> -->
 
     <script type="module" src="../assets/js/dashboard.js"></script>
 </body>

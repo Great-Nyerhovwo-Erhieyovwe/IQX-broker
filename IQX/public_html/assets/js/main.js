@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const originalText = numDiv.textContent;
                     const suffix = originalText.replace(targetValue, '').trim();
 
-                    animateValue(numDiv, 0, targetValue, 2500, suffix); // 2.5 second animation
+                    animateValue(numDiv, 0, targetValue, 4500, suffix); // 2.5 second animation
                 });
 
                 entry.target.dataset.animated = 'true'; // Mark as animated
@@ -151,12 +151,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // === Fake random data ===
     const names = [
-        "Michael", "Sarah", "James", "Emma", "David", "Sophia", "Daniel",
-        "Olivia", "Liam", "Mia", "Noah", "Ava", "Ethan", "Isabella",
-        "Lucas", "Amelia", "Mason", "Charlotte", "Henry", "Grace"
+        "Michael", "Sarah", "James", "Emmanuel", "Chaddy", "George", "Vladimir", "Alex", "Yashika", "David", "Sophia", "Daniel", "Annie", "Annalisa", "Kessy", "Morph", "Ratesh Kumar", "Nuelihno",
+        "Olivia", "Liam", "Mia", "Noah", "Ava", "Ethan", "Isabella", "Kia", "Mario", "Luke", "Jason", "Calvin", "Eunice", "Kaya", "Lindani", "Qairat", "Dickson",
+        "Lucas", "Amelia", "Mason", "Charlotte", "Henry", "Grace", "Arrie", "Vivian", "Collins", "Kumar", "Mary Renteria", "Maria", "Mark", "Tyson", "Zuevich", "Shawn", "Anderson", "Usman", "Diario", "Johan Rincon", "Tyler", "Wilson", "Martin"
     ];
 
-    function randomAmount(min = 20, max = 8000) {
+    function randomAmount(min = 20, max = 50000) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 

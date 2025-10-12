@@ -83,7 +83,7 @@ body {
 }
 
 #alertBox button {
-    margin-left: 15px;
+    margin-left: 10px;
     background: transparent;
     border: none;
     font-size: 28px;
@@ -238,16 +238,7 @@ h4 {
 .header {
     position: relative;
     width: 100%;
-    /* height: 400px; */
-    /* overflow: hidden; */
-    /* display: flex; */
-    /* justify-content: center; */
-    /* align-items: center; */
-    /* flex-direction: column; */
     text-align: center;
-    /* background-color: #000; */
-    /* background-image: url(../Images/concentric_squares-footer.png); */
-    /* box-shadow: inset 1000px 1000px 2000px rgba(0, 0, 0, 0.5); */
     background-size: cover;
     background-position: center;
     color: white;
@@ -351,19 +342,23 @@ header .text-content {
 }
 
 .boxes {
-        display: flex;
-        justify-content: space-around;
-        margin-top: 2rem;
-    }
+    display: flex;
+    justify-content: space-around;
+    margin-top: 2rem;
+}
 
-    .boxes .icon {
-        font-size: 2rem;
-    }
+.boxes .icon {
+    font-size: 1.4rem;
+}
 
-    .boxes .number {
-        font-size: 50px;
-        font-weight: bold;
-    }
+.boxes .number {
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.box p {
+    font-size: 0.9em;
+}
 
 #newsletter {
     padding: 2.2rem 1.2rem;
@@ -504,9 +499,10 @@ header .text-content {
     margin-right: 0.7rem;
 }
 
+/* 
 .boxes {
     display: none;
-}
+} */
 
 
 /* join Courses */
@@ -769,6 +765,11 @@ select {
     backdrop-filter: blur(16px);
 }
 
+option {
+    border: none;
+    background-color: #555;
+}
+
 .dd-form button {
     width: 100%;
     padding: 14px;
@@ -821,7 +822,7 @@ h4 {
 } */
 
 /* about cboe */
-#cboe {
+#iqx {
     /* background-color: #333; */
     color: white;
     padding: 15px;
@@ -829,16 +830,16 @@ h4 {
     background: transparent !important;
 }
 
-#cboe span {
+#iqx span {
     color: var(--text-secondary);
 }
 
-.abt-cboe-image {
+.abt-iqx-image {
     position: relative;
     display: inline-block;
 }
 
-.abt-cboe-image img {
+.abt-iqx-image img {
     border-radius: 16px;
     display: block;
     background-repeat: no-repeat;
@@ -847,10 +848,7 @@ h4 {
     margin: 0 auto;
 }
 
-#cboe .about-cboe {
-    /* background-color: #66a6ff; */
-    /* border: 2px solid gray; */
-    /* box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); */
+#iqx .about-iqx {
     margin: 1.4rem;
     padding: 2rem;
     border-radius: 18px;
@@ -859,23 +857,24 @@ h4 {
     border: 1px solid var(--glass-border);
 }
 
-.about-cboe p {
+.about-iqx p {
     color: var(--text-secondary);
     font-weight: 500;
     padding: 1rem 1rem;
     text-align: center;
 }
 
-.about-cboe h4 {
+.about-iqx h4 {
     color: white;
     text-align: start;
+    padding-bottom: 2rem;
 }
 
-.about-cboe strong {
+.about-iqx strong {
     color: var(--text-secondary);
 }
 
-.what-cboe-does {
+.what-iqx-does {
     /* background-color: #66a6ff; */
     /* box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); */
     margin: 1.4rem;
@@ -886,12 +885,12 @@ h4 {
     border: 1px solid var(--glass-border);
 }
 
-.what-cboe-does ul {
+.what-iqx-does ul {
     list-style-type: none;
     /* padding: 2rem; */
 }
 
-.what-cboe-does li {
+.what-iqx-does li {
     padding: 0.6rem 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
@@ -934,7 +933,8 @@ h4 {
 
 .others p {
     font-weight: lighter;
-    color: var(--text-secondary);
+    /* color: var(--text-secondary); */
+    color: var(--accent);
 }
 
 .others h4 {
@@ -1011,7 +1011,7 @@ h4 {
 }
 
 /* brad traversy youtube */
-#cboe-youtube {
+#iqx-youtube {
     /* background: linear-gradient(to right, red, black); */
     color: white;
     padding-bottom: 2.5rem;
@@ -1019,7 +1019,7 @@ h4 {
     background: transparent !important;
 }
 
-.cboe-youtube-image img {
+.iqx-youtube-image img {
     /* position: relative; */
     width: 90%;
     background-repeat: no-repeat;
@@ -1029,11 +1029,11 @@ h4 {
     border-radius: 16px;
 }
 
-.cboe-on-youtube {
+.iqx-on-youtube {
     text-align: center;
 }
 
-.cboe-on-youtube button {
+.iqx-on-youtube button {
     color: white;
     background: var(--glass-strong);
     font-weight: bold;
@@ -1244,7 +1244,7 @@ h4 {
         padding-right: 2rem;
     }
 
-     .boxes {
+    .boxes {
         display: flex;
         justify-content: space-around;
         margin-top: 3rem;
@@ -1257,7 +1257,11 @@ h4 {
     .boxes .number {
         font-size: 50px;
         font-weight: bold;
-    } 
+    }
+
+    .box p {
+        font-size: 1.7em;
+    }
 
     #newsletter {
         display: flex;
@@ -1488,13 +1492,13 @@ h4 {
         flex-direction: row;
     }
 
-    .abt-cboe {
+    .abt-iqx {
         display: flex;
         flex-direction: row;
         gap: 50px;
     }
 
-    .about-cboe {
+    .about-iqx {
         width: 500px;
         height: 400px;
         background: var(--glass-bg);
@@ -1503,7 +1507,7 @@ h4 {
         border: 1px solid var(--glass-border);
     }
 
-    .what-cboe-does {
+    .what-iqx-does {
         width: 400px;
         height: 400px;
         background: var(--glass-bg);
@@ -1512,11 +1516,11 @@ h4 {
         border: 1px solid var(--glass-border);
     }
 
-    #cboe h2 {
+    #iqx h2 {
         font-size: 32px;
     }
 
-    .about-cboe p {
+    .about-iqx p {
         text-align: start;
     }
 
@@ -1539,31 +1543,31 @@ h4 {
         grid-area: 1/4/3/4;
     }
 
-    .cboemedia-youtube {
+    .iqxmedia-youtube {
         display: flex;
         flex-direction: row;
         /* row-gap: 10px; */
     }
 
-    .cboe-youtube-image img {
+    .iqx-youtube-image img {
         object-fit: contain;
         border-radius: 16px;
     }
 
-    .cboe-on-youtube {
+    .iqx-on-youtube {
         text-align: center;
         padding-top: 9rem;
     }
 
-    .cboe-on-youtube p {
+    .iqx-on-youtube p {
         padding-left: 3rem;
     }
 
-    .cboe-on-youtube h2 {
+    .iqx-on-youtube h2 {
         font-size: 35px;
     }
 
-    .cboe-on-youtube button {
+    .iqx-on-youtube button {
         padding: 1rem 3rem;
         margin-top: 1.2rem;
     }
@@ -1600,7 +1604,7 @@ h4 {
         font-size: 16px;
     }
 
-    .traversy-on-sociamedia {
+    .iqx-on-sociamedia {
         margin-right: 1rem;
         padding-top: 1.3rem;
         padding-bottom: 1rem;
