@@ -1,216 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin | Manage Users</title>
 
   <link rel="stylesheet" href="./assets/css/admin-dashboard.css" />
-
-  <!-- ✅ Font Awesome fixed to a valid version -->
   <link
     rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-    integrity="sha512-pO12rT+DcL5n3ePxx5hR2TFWReS+UxZ35uR9Y9Af8HzlxVfKfFQ8eOi5GK3nLkAfiL0+6Bz/J6E4jqG4lgFj1g=="
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    integrity="sha512-2pczP9zHyaZ3EtnuZlsm+wn9lFzdu0qA7W3rOBTVQkM/9FhKpWzM2c1FRPyq3Hwv16MZwbzPzZB06z/4o1zXag=="
     crossorigin="anonymous"
     referrerpolicy="no-referrer"
   />
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-    // ✅ Your Firebase config
-    const firebaseConfig = {
-      apiKey: "AIzaSyBTGdLyfpv9xzmh5hYoctay0Ev4W4lpAjM",
-      authDomain: "cboefirebaseserver.firebaseapp.com",
-      projectId: "cboefirebaseserver",
-      storageBucket: "cboefirebaseserver.firebasestorage.app",
-      messagingSenderId: "755491003217",
-      appId: "1:755491003217:web:2a10ffad1f38c9942f5170",
-      measurementId: "G-FCZEERNC06",
-    };
-
-    // ✅ Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    window.auth = getAuth(app);
-    window.db = getFirestore(app);
-
-    // ✅ Auth + Admin check
-    onAuthStateChanged(window.auth, async (user) => {
-      if (user) {
-        window.currentUser = user;
-
-        const userDocRef = doc(window.db, "users", user.uid);
-        const docSnap = await getDoc(userDocRef);
-
-        if (docSnap.exists() && docSnap.data().isAdmin === true) {
-          console.log("Admin user authenticated.");
-          document.body.classList.remove("loading");
-        } else {
-          console.warn("Not an admin → redirecting.");
-          await signOut(window.auth);
-          window.location.href = "admin-login.html";
-        }
-      } else {
-        console.log("No user signed in → redirecting.");
-        window.location.href = "admin-login.html";
-      }
-    });
-  </script>
-
-  <style>
-    .loading #dashboard-container {
-      display: none;
-    }
-    .light-mode {
-      background-color: #f4f7f6;
-    }
-  </style>
 </head>
 
-<body class="light-mode loading">
+<body class="light-mode">
   <div id="dashboard-container">
-    <aside id="sidebar" class="sidebar">
+    <aside id="sidebar">
       <div class="sidebar-header">
         <h2>IQX Admin</h2>
       </div>
-      <nav id="sidebar-menu">
+      <nav>
         <ul>
-          <li>
-            <a href="admin-dashboard.html"><i class="fas fa-home"></i><span>Dashboard</span></a>
-          </li>
-          <li>
-            <a href="manage-users.html" class="active"><i class="fa-solid fa-user-gear"></i><span>Manage Users</span></a>
-          </li>
-          <li>
-            <a href="transaction.html"><i class="fa-solid fa-wallet"></i><span>Transactions</span></a>
-          </li>
+          <li><a href="admin-dashboard.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+          <li><a href="manage-users.html" class="active"><i class="fa-solid fa-user-gear"></i><span>Manage Users</span></a></li>
+          <li><a href="transaction.html"><i class="fa-solid fa-wallet"></i><span>Transactions</span></a></li>
         </ul>
       </nav>
       <div class="sidebar-footer">
-        <button id="theme-toggle" class="sidebar-btn">
-          <i class="fas fa-moon"></i><span>Toggle Theme</span>
-        </button>
-        <button id="logout-btn" class="sidebar-btn profile-sidebar-btn">
-          <i class="fas fa-sign-out-alt"></i><span>Logout</span>
-        </button>
+        <button id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
       </div>
     </aside>
 
     <div id="main-content">
-      <header id="navbar" class="navbar">
+      <header class="navbar">
         <div class="navbar-left">
-          <button id="sidebar-toggle" class="hamburger-btn">
-            <i class="fas fa-bars"></i>
-          </button>
+          <button id="sidebar-toggle"><i class="fas fa-bars"></i></button>
           <span class="company-name">IQX Admin</span>
-        </div>
-
-        <div class="navbar-right">
-          <div id="nav-notification">
-            <i class="fa-solid fa-bell"></i>
-          </div>
-
-          <div id="profile-dropdown" class="profile-container">
-            <div class="profile-info">
-              <span class="user-name" id="admin-user-name">Welcome, Admin</span>
-              <img src="" alt="avatar" class="profile-avatar" />
-            </div>
-            <div class="dropdown-menu hidden">
-              <a href="#" id="dropdown-settings">Settings</a>
-              <a href="#" id="dropdown-logout">Logout</a>
-            </div>
-          </div>
         </div>
       </header>
 
-      <main id="content">
-        <h3 id="page-title">Manage Users</h3>
+      <main>
+        <h3>Manage Users</h3>
 
-        <section>
-          <div class="table-controls">
-            <input type="text" id="user-search" placeholder="Search by name, email, or username" />
-            <select id="status-filter">
-              <option value="all">All Users</option>
-              <option value="active">Active/Normal</option>
-              <option value="banned">Banned</option>
-              <option value="frozen">Frozen</option>
-            </select>
-          </div>
+        <!-- Filters -->
+        <div class="filters">
+          <input type="text" id="user-search" placeholder="Search by name, email, or username" />
+          <select id="status-filter">
+            <option value="all">All Users</option>
+            <option value="active">Active</option>
+            <option value="frozen">Frozen</option>
+            <option value="banned">Banned</option>
+          </select>
+        </div>
 
-          <div class="table-responsive">
-            <table id="users-table">
-              <thead>
-                <tr>
-                  <th>UID</th>
-                  <th>Name (Username)</th>
-                  <th>Email</th>
-                  <th>Account Type</th>
-                  <th>Balance ($)</th>
-                  <th>ROI (%)</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="users-table-body">
-                <tr><td colspan="8" style="text-align: center;">Loading users...</td></tr>
-              </tbody>
-            </table>
+        <!-- Users Cards -->
+        <div id="users-container">
+          <!-- Example User Card -->
+          <div class="user-card">
+            <div class="user-header">
+              <img src="https://via.placeholder.com/60" alt="avatar" class="user-avatar" />
+              <div>
+                <h4>John Doe</h4>
+                <p>john@example.com</p>
+              </div>
+            </div>
+            <div class="user-info">
+              <p><strong>Balance:</strong> $0.00</p>
+              <p><strong>Status:</strong> <span class="status-badge normal">Normal</span></p>
+              <p><strong>ROI:</strong> 0%</p>
+            </div>
+            <div class="user-actions">
+              <button class="edit-btn"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+              <button class="freeze-btn"><i class="fa-solid fa-snowflake"></i> Freeze</button>
+              <button class="ban-btn"><i class="fa-solid fa-ban"></i> Ban</button>
+            </div>
           </div>
-          <div id="pagination-controls"></div>
-        </section>
+        </div>
       </main>
     </div>
   </div>
 
-  <!-- User Action Modal -->
+  <!-- User Action Modal (hidden by default) -->
   <div id="action-modal" class="modal" style="display: none;">
     <div class="modal-content">
       <span class="close-btn">&times;</span>
       <h3 id="modal-action-title">Update User Data</h3>
-      <p id="modal-action-message"></p>
       <form id="update-user-form">
-        <input type="hidden" id="modal-user-uid" />
+        <input type="hidden" id="modal-user-id" />
 
         <h4>Balance Adjustment</h4>
-        <div class="form-group">
-          <label for="new-balance-amount">Amount:</label>
-          <input type="number" id="new-balance-amount" step="0.01" value="0.00" />
-        </div>
-        <div class="form-group">
-          <label for="balance-action">Action:</label>
-          <select id="balance-action">
-            <option value="add">Add to Balance</option>
-            <option value="subtract">Subtract from Balance</option>
-            <option value="set">Set New Balance</option>
-          </select>
-        </div>
-
-        <hr />
+        <label for="new-balance">Amount:</label>
+        <input type="number" id="new-balance" step="0.01" value="0.00" />
+        <label for="balance-action">Action:</label>
+        <select id="balance-action">
+          <option value="add">Add to Balance</option>
+          <option value="subtract">Subtract from Balance</option>
+          <option value="set">Set New Balance</option>
+        </select>
 
         <h4>Account Status</h4>
-        <div class="form-group">
-          <label for="account-status">Set Status:</label>
-          <select id="account-status">
-            <option value="normal">Normal</option>
-            <option value="frozen">Frozen</option>
-            <option value="banned">Banned</option>
-            <option value="admin">Promote to Admin</option>
-          </select>
-        </div>
+        <label for="account-status">Set Status:</label>
+        <select id="account-status">
+          <option value="normal">Normal</option>
+          <option value="frozen">Frozen</option>
+          <option value="banned">Banned</option>
+          <option value="admin">Promote to Admin</option>
+        </select>
 
-        <button type="submit" id="execute-update-btn" class="btn-primary">Execute Update</button>
+        <button type="submit" class="btn-primary">Execute Update</button>
       </form>
     </div>
   </div>
-
-  <div id="mobile-overlay" class="mobile-overlay hidden"></div>
-
-  <!-- ✅ Load scripts in correct order -->
-  <script type="module" src="../firebase-config.js"></script>
-  <script type="module" src="./assets/js/admin-dashboard.js"></script>
 </body>
 </html>
