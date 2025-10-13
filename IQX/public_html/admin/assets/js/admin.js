@@ -1,19 +1,20 @@
 // assets/js/admin.js
-// Uses global `supabase` object from the v2 script
 
+// Use the global supabase object from the v2 script
 const SUPABASE_URL = 'https://aqotnpbcrqaiqonpfshj.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFxb3RucGJjcnFhaXFvbnBmc2hqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDUwNDMsImV4cCI6MjA3NTQ4MTA0M30.rqwwCxMp2PBydSE99QJOL-nt1UjxkI7-ea0Q8Wk5SVI';
 
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const loginForm = document.getElementById("adminLoginForm");
+// DOM Elements
+const loginBtn = document.getElementById("adminLoginBtn");
 const emailInput = document.getElementById("adminEmail");
 const passwordInput = document.getElementById("adminPassword");
 const statusMsg = document.getElementById("adminLoginMsg");
-const submitButton = document.getElementById("adminLoginBtn");
 
-loginForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
+// Login click handler
+loginBtn.addEventListener("click", async (e) => {
+  e.preventDefault(); // prevent any default behavior
   statusMsg.textContent = "";
   statusMsg.style.color = "black";
 
@@ -26,32 +27,36 @@ loginForm.addEventListener("submit", async (e) => {
     return;
   }
 
-  submitButton.disabled = true;
-  submitButton.textContent = "Logging in...";
+  loginBtn.disabled = true;
+  loginBtn.textContent = "Logging in...";
 
   try {
-    // 1️⃣ Sign in user
-    const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+    // 1️⃣ Sign in with Supabase
+    const { data: userData, error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
 
-    if (signInError || !authData.user) {
+    if (signInError || !userData.user) {
       throw signInError || new Error("Login failed");
     }
 
-    // 2️⃣ Check admins table
+    // 2️⃣ Check if the user exists in the 'admins' table
     const { data: adminData, error: adminError } = await supabase
       .from("admins")
       .select("*")
-      .eq("id", authData.user.id)
+      .eq("id", userData.user.id)
       .single();
 
     if (adminError || !adminData) {
+      // Not an admin → sign out and show error
       await supabase.auth.signOut();
       statusMsg.textContent = "You are not authorized as an admin.";
       statusMsg.style.color = "red";
       return;
     }
 
-    // ✅ Success → redirect
+    // 3️⃣ Success → redirect to dashboard
     window.location.href = "./admin-dashboard.html";
 
   } catch (err) {
@@ -59,7 +64,7 @@ loginForm.addEventListener("submit", async (e) => {
     statusMsg.textContent = err.message || "Invalid email or password.";
     statusMsg.style.color = "red";
   } finally {
-    submitButton.disabled = false;
-    submitButton.textContent = "Login";
+    loginBtn.disabled = false;
+    loginBtn.textContent = "Login";
   }
 });
