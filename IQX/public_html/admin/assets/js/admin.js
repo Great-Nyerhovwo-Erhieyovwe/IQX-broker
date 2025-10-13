@@ -1,6 +1,4 @@
-// assets/js/admin.js
-
-// Use the global supabase object from the v2 script
+// Use global supabase object (v2 library included in HTML)
 const SUPABASE_URL = 'https://aqotnpbcrqaiqonpfshj.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFxb3RucGJjcnFhaXFvbnBmc2hqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDUwNDMsImV4cCI6MjA3NTQ4MTA0M30.rqwwCxMp2PBydSE99QJOL-nt1UjxkI7-ea0Q8Wk5SVI';
 
@@ -13,8 +11,7 @@ const passwordInput = document.getElementById("adminPassword");
 const statusMsg = document.getElementById("adminLoginMsg");
 
 // Login click handler
-loginBtn.addEventListener("click", async (e) => {
-  e.preventDefault(); // prevent any default behavior
+loginBtn.addEventListener("click", async () => {
   statusMsg.textContent = "";
   statusMsg.style.color = "black";
 
@@ -32,16 +29,13 @@ loginBtn.addEventListener("click", async (e) => {
 
   try {
     // 1️⃣ Sign in with Supabase
-    const { data: userData, error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
+    const { data: userData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
 
     if (signInError || !userData.user) {
       throw signInError || new Error("Login failed");
     }
 
-    // 2️⃣ Check if the user exists in the 'admins' table
+    // 2️⃣ Check if user exists in 'admins' table
     const { data: adminData, error: adminError } = await supabase
       .from("admins")
       .select("*")
@@ -49,14 +43,13 @@ loginBtn.addEventListener("click", async (e) => {
       .single();
 
     if (adminError || !adminData) {
-      // Not an admin → sign out and show error
       await supabase.auth.signOut();
       statusMsg.textContent = "You are not authorized as an admin.";
       statusMsg.style.color = "red";
       return;
     }
 
-    // 3️⃣ Success → redirect to dashboard
+    // 3️⃣ Success → redirect
     window.location.href = "./admin-dashboard.html";
 
   } catch (err) {
