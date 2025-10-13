@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     coinType: document.getElementById('coinType'),
     networkType: document.getElementById('networkType'),
     walletAddressDisplay: document.getElementById('walletAddressDisplay'),
-    qrCodeImage: document.getElementById('qrCodeImage'),
+    copyAddressBtn: document.getElementById('copyAddressBtn'), // NEW: Copy to clipboard button
 
     sidebar: document.getElementById("sidebar"),
     sidebarToggle: document.getElementById("sidebar-toggle"),
@@ -106,6 +106,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     return Object.keys(networksObj)[0] || null;
   }
 
+  // NEW UTILITY: Copy text to clipboard
+  async function copyToClipboard(text, successMessage = 'Copied!') {
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      showPopup(successMessage, true);
+    } catch (err) {
+      console.error('Copy failed:', err);
+      showPopup('Copy failed. Your browser may not support this feature.', false);
+      // Fallback: Use textarea for older browsers/insecure contexts
+      const el = document.createElement('textarea');
+      el.value = text;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+    }
+  }
+
   // ---------- Wallet config (fetch + realtime) ----------
   async function fetchWalletConfigOnce() {
     try {
@@ -150,63 +169,77 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  // FIX: Reworked to correctly preserve selected coin/network on config update
   function updateNetworkOptions() {
     const coinTypeSelect = DOM.coinType;
     const networkTypeSelect = DOM.networkType;
     const walletAddressDisplay = DOM.walletAddressDisplay;
-    const qrCodeImage = DOM.qrCodeImage;
     if (!coinTypeSelect || !networkTypeSelect) return;
+
+    // 1. Get current selections (before update)
+    const prevCoin = coinTypeSelect.value;
+    const prevNetwork = networkTypeSelect.value;
 
     networkTypeSelect.innerHTML = '';
     const coinKeys = Object.keys(WALLET_CONFIG || {});
+
+    // Handle no coins
     if (coinKeys.length === 0) {
       coinTypeSelect.innerHTML = '<option value="">-- No coins configured --</option>';
       if (walletAddressDisplay) walletAddressDisplay.textContent = 'No configuration';
-      if (qrCodeImage?.parentElement) qrCodeImage.parentElement.style.display = 'none';
+      if (DOM.copyAddressBtn) DOM.copyAddressBtn.style.display = 'none';
       return;
     }
 
-    const prevCoin = coinTypeSelect.value;
-    const matchedCoinKey = findCoinKey(WALLET_CONFIG, prevCoin) || coinKeys[0];
-
+    // 2. Populate Coin options and determine selected coin
     coinTypeSelect.innerHTML = '';
+    let foundPrevCoin = false;
     coinKeys.forEach(ck => {
       const opt = document.createElement('option');
       opt.value = ck;
       opt.textContent = ck;
       coinTypeSelect.appendChild(opt);
+      if (ck === prevCoin) foundPrevCoin = true;
     });
+
+    const matchedCoinKey = foundPrevCoin ? prevCoin : coinKeys[0]; // Retain prevCoin or default to first
     coinTypeSelect.value = matchedCoinKey;
 
+    // 3. Populate Network options and determine selected network
     const networksObj = WALLET_CONFIG[matchedCoinKey] || {};
     const networkKeys = Object.keys(networksObj);
+
+    // Handle no networks for the selected coin
     if (networkKeys.length === 0) {
       networkTypeSelect.innerHTML = '<option value="">-- No networks --</option>';
       if (walletAddressDisplay) walletAddressDisplay.textContent = 'Configuration not available.';
-      if (qrCodeImage?.parentElement) qrCodeImage.parentElement.style.display = 'none';
+      if (DOM.copyAddressBtn) DOM.copyAddressBtn.style.display = 'none';
       return;
     }
 
-    const prevNetwork = networkTypeSelect.value;
-    const matchedNetworkKey = findNetworkKey(networksObj, prevNetwork) || networkKeys[0];
-    networkTypeSelect.innerHTML = '';
+    let foundPrevNetwork = false;
     networkKeys.forEach(nk => {
       const opt = document.createElement('option');
       opt.value = nk;
       opt.textContent = nk;
       networkTypeSelect.appendChild(opt);
+      if (nk === prevNetwork) foundPrevNetwork = true;
     });
+
+    const matchedNetworkKey = foundPrevNetwork ? prevNetwork : networkKeys[0]; // Retain prevNetwork or default to first
     networkTypeSelect.value = matchedNetworkKey;
 
+    // 4. Update display
     updateDepositDisplay();
   }
 
+  // UPDATED: Removed QR code image logic and added copy button management
   function updateDepositDisplay() {
     const walletAddressDisplay = DOM.walletAddressDisplay;
-    const qrCodeImage = DOM.qrCodeImage;
+    const copyAddressBtn = DOM.copyAddressBtn;
     const coinTypeSelect = DOM.coinType;
     const networkTypeSelect = DOM.networkType;
-    if (!walletAddressDisplay || !qrCodeImage || !coinTypeSelect || !networkTypeSelect) return;
+    if (!walletAddressDisplay || !coinTypeSelect || !networkTypeSelect) return;
 
     const selectedCoin = coinTypeSelect.value || '';
     const selectedNetwork = networkTypeSelect.value || '';
@@ -216,15 +249,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (data && data.address) {
       walletAddressDisplay.textContent = data.address;
-      if (data.qr_path) {
-        qrCodeImage.src = data.qr_path;
-        if (qrCodeImage.parentElement) qrCodeImage.parentElement.style.display = '';
-      } else if (qrCodeImage.parentElement) {
-        qrCodeImage.parentElement.style.display = 'none';
+      if (copyAddressBtn) {
+          copyAddressBtn.style.display = 'inline-block'; // Show copy button
+          copyAddressBtn.setAttribute('data-address', data.address);
       }
     } else {
       walletAddressDisplay.textContent = 'Configuration not available.';
-      if (qrCodeImage.parentElement) qrCodeImage.parentElement.style.display = 'none';
+      if (copyAddressBtn) copyAddressBtn.style.display = 'none'; // Hide copy button
     }
   }
 
@@ -331,7 +362,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions', filter: `user_id=eq.${uid}` }, (payload) => {
           // For efficiency, handle payload directly when possible
           const newRow = payload?.new;
-          const oldRow = payload?.old;
           // If it's insert or update, refresh the small transaction list and notify if status changed to approved/declined
           fetchTransactionsOnce(uid);
 
@@ -637,6 +667,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ---------- Modal & button wiring ----------
   function wireModalButtons() {
     if (DOM.openAddBtn && DOM.addModal) {
+      // Ensure display is updated when modal is opened
       DOM.openAddBtn.addEventListener('click', () => { openModal(DOM.addModal); updateDepositDisplay(); });
     }
     if (DOM.openWithdrawBtn && DOM.withdrawModal) {
@@ -656,8 +687,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (DOM.confirmAdd) DOM.confirmAdd.addEventListener('click', handleDepositSubmit);
     if (DOM.confirmWithdraw) DOM.confirmWithdraw.addEventListener('click', handleWithdrawSubmit);
 
+    // FIX: Attach listeners for coin/network changes to re-render the deposit display
     if (DOM.coinType) DOM.coinType.addEventListener('change', updateNetworkOptions);
     if (DOM.networkType) DOM.networkType.addEventListener('change', updateDepositDisplay);
+
+    // NEW: Copy to clipboard wiring
+    if (DOM.copyAddressBtn) {
+        DOM.copyAddressBtn.addEventListener('click', (e) => {
+            const address = e.currentTarget.getAttribute('data-address');
+            if (address) {
+                copyToClipboard(address, 'Wallet address copied! 📋');
+            } else {
+                showPopup('No wallet address to copy.', false);
+            }
+        });
+    }
   }
 
   // ---------- Auth and bootstrapping ----------
@@ -751,8 +795,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     wireModalButtons();
 
     // Wallet config & realtime
-    await fetchWalletConfigOnce();
-    subscribeWalletConfig();
+    // These functions are called here, and again in initAuthAndStart for full coverage
+    // await fetchWalletConfigOnce();
+    // subscribeWalletConfig();
 
     // Auth + realtime user/transactions
     await initAuthAndStart();
