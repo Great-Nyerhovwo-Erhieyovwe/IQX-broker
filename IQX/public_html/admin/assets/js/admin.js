@@ -5,7 +5,6 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const SUPABASE_URL = 'https://aqotnpbcrqaiqonpfshj.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFxb3RucGJjcnFhaXFvbnBmc2hqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDUwNDMsImV4cCI6MjA3NTQ4MTA0M30.rqwwCxMp2PBydSE99QJOL-nt1UjxkI7-ea0Q8Wk5SVI';
 
-
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // DOM Elements
@@ -14,6 +13,7 @@ const emailInput = document.getElementById("adminEmail");
 const passwordInput = document.getElementById("adminPassword");
 const errorDiv = document.getElementById("adminLoginError");
 
+// Login form submit
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   errorDiv.textContent = "";
@@ -31,31 +31,31 @@ loginForm.addEventListener("submit", async (e) => {
   submitButton.textContent = "Logging in...";
 
   try {
-    // Sign in with Supabase
-    const { data: user, error: signInError } = await supabase.auth.signInWithPassword({
+    // 1️⃣ Sign in with Supabase
+    const { data: userData, error: signInError } = await supabase.auth.signInWithPassword({
       email,
       password
     });
 
-    if (signInError || !user) {
+    if (signInError || !userData || !userData.user) {
       throw signInError || new Error("Login failed");
     }
 
-    // Check if user is admin (assuming you have a 'role' column)
+    // 2️⃣ Check if user exists in the admins table
     const { data: adminData, error: adminError } = await supabase
-      .from("users")  // or "admins" table if you separate
+      .from("admins")
       .select("*")
-      .eq("id", user.user.id)
-      .eq("role", "admin")
+      .eq("id", userData.user.id)
       .single();
 
     if (adminError || !adminData) {
+      // Not an admin → sign out and show error
       await supabase.auth.signOut();
       errorDiv.textContent = "You are not authorized as an admin.";
       return;
     }
 
-    // ✅ Redirect to admin dashboard
+    // 3️⃣ Redirect to admin dashboard
     window.location.href = "./admin-dashboard.html";
 
   } catch (error) {
