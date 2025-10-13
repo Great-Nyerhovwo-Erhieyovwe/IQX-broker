@@ -3,33 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Login</title>
-  <link rel="stylesheet" href="./assets/css/admin.css" />
+  <title>Admin Login | IQX</title>
 </head>
+
 <body>
   <div class="admin-login-container">
     <h2>Admin Login</h2>
+
     <form id="adminLoginForm">
-      <input type="email" id="adminEmail" placeholder="Admin Email" required />
-      <input type="password" id="adminPassword" placeholder="Password" required />
-      <button type="submit">Login</button>
-      <div id="adminLoginError" class="error-msg"></div>
+      <div class="form-group">
+        <label for="adminEmail">Admin Email</label>
+        <input type="email" id="adminEmail" placeholder="Enter your admin email" required />
+      </div>
+
+      <div class="form-group">
+        <label for="adminPassword">Password</label>
+        <input type="password" id="adminPassword" placeholder="Enter your password" required />
+      </div>
+
+      <button type="submit" id="adminLoginBtn">Login</button>
+
+      <p id="adminLoginMsg" class="status-msg"></p>
     </form>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { firebaseConfig } from "../firebase-config.js"; // adjust path
+  <!-- Supabase Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    // Make Firebase available globally if admin.js needs it
-    window.firebaseApp = app;
-    window.auth = auth;
-  </script>
-
-  <script type="module" src="../assets/js/admin.js"></script>
+  <!-- JS (to be added later) -->
+  <script src="./assets/js/admin.js" type="module"></script>
 </body>
 </html>
