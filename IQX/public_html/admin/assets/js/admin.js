@@ -1,51 +1,68 @@
 // assets/js/admin.js
-import { 
-  getAuth, 
-  signInWithEmailAndPassword, 
-  signOut 
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-import { 
-  getFirestore, 
-  doc, 
-  getDoc 
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+// Replace with your Supabase credentials
+const SUPABASE_URL = 'https://aqotnpbcrqaiqonpfshj.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFxb3RucGJjcnFhaXFvbnBmc2hqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDUwNDMsImV4cCI6MjA3NTQ4MTA0M30.rqwwCxMp2PBydSE99QJOL-nt1UjxkI7-ea0Q8Wk5SVI';
 
-import { firebaseConfig } from "../../firebase-config.js"; 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-document.getElementById("adminLoginForm").addEventListener("submit", async (e) => {
+// DOM Elements
+const loginForm = document.getElementById("adminLoginForm");
+const emailInput = document.getElementById("adminEmail");
+const passwordInput = document.getElementById("adminPassword");
+const errorDiv = document.getElementById("adminLoginError");
+
+loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
+  errorDiv.textContent = "";
 
-  const email = document.getElementById("adminEmail").value.trim();
-  const password = document.getElementById("adminPassword").value;
-  const errorDiv = document.getElementById("adminLoginError");
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
 
-  errorDiv.textContent = ""; // clear old errors
+  if (!email || !password) {
+    errorDiv.textContent = "Please enter both email and password.";
+    return;
+  }
+
+  const submitButton = loginForm.querySelector("button[type='submit']");
+  submitButton.disabled = true;
+  submitButton.textContent = "Logging in...";
 
   try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
+    // Sign in with Supabase
+    const { data: user, error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
 
-    // ✅ Check if user is in admins collection
-    const adminRef = doc(db, "admins", user.uid);
-    const adminSnap = await getDoc(adminRef);
-
-    if (adminSnap.exists()) {
-      // Redirect to admin dashboard
-      window.location.href = "./admin-dashboard.html";
-    } else {
-      // ❌ Not an admin, sign out and show error
-      await signOut(auth);
-      errorDiv.textContent = "You are not authorized as an admin.";
+    if (signInError || !user) {
+      throw signInError || new Error("Login failed");
     }
+
+    // Check if user is admin (assuming you have a 'role' column)
+    const { data: adminData, error: adminError } = await supabase
+      .from("users")  // or "admins" table if you separate
+      .select("*")
+      .eq("id", user.user.id)
+      .eq("role", "admin")
+      .single();
+
+    if (adminError || !adminData) {
+      await supabase.auth.signOut();
+      errorDiv.textContent = "You are not authorized as an admin.";
+      return;
+    }
+
+    // ✅ Redirect to admin dashboard
+    window.location.href = "./admin-dashboard.html";
 
   } catch (error) {
     console.error("Login failed:", error);
     errorDiv.textContent = "Invalid email or password.";
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = "Login";
   }
 });
