@@ -6,37 +6,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin | Wallet & Verification</title>
 
-  <link rel="stylesheet" href="./assets/css/admin-dashboard.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-    integrity="sha512-pO12rT+DcL5n3ePxx5hR2TFWReS+UxZ35uR9Y9Af8HzlxVfKfFQ8eOi5GK3nLkAfiL0+6Bz/J6E4jqG4lgFj1g=="
-    crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-  <style>
-    .loading #dashboard-container { display: none; }
-    .light-mode { background-color: #f4f7f6; }
-    .user-card { background: #fff; padding: 15px; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-    .user-info { display: flex; flex-direction: column; gap: 3px; }
-    .user-actions button { margin-left: 5px; }
-  </style>
+  <link rel="stylesheet" href="../assets/css/admin-dashboard.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 </head>
 
 <body class="light-mode loading">
-
   <div id="dashboard-container">
-
-    <aside id="sidebar" class="sidebar">
-      <div class="sidebar-header"><h2>IQX Admin</h2></div>
-      <nav id="sidebar-menu">
+    <aside id="sidebar">
+      <div class="sidebar-header">
+        <h2>IQX Admin</h2>
+      </div>
+      <nav>
         <ul>
-          <li><a href="admin-dashboard.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
-          <li><a href="manage-users.html"><i class="fa-solid fa-user-gear"></i><span>Manage Users</span></a></li>
-          <li><a href="wallet-verification.html" class="active"><i class="fa-solid fa-wallet"></i><span>Wallet & Verification</span></a></li>
-          <li><a href="transactions.html"><i class="fa-solid fa-list"></i><span>Transactions</span></a></li>
+          <li><a href="dashboard.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+          <li><a href="users.html"><i class="fas fa-users"></i><span>Manage User</span></a></li>
+          <li><a href="wallet.html" class="active"><i class="fas fa-wallet"></i><span>Manage Wallet</span></a></li>
+          <li><a href="overview.html"><i class="fa-solid fa-users"></i><span>Users Overview</span></a></li>
+          <li><a href="transaction.html"><i class="fa-solid fa-wallet"></i><span>Transactions</span></a></li>
         </ul>
       </nav>
+
       <div class="sidebar-footer">
-        <button id="theme-toggle" class="sidebar-btn"><i class="fas fa-moon"></i><span>Toggle Theme</span></button>
-        <button id="logout-btn" class="sidebar-btn profile-sidebar-btn"><i class="fas fa-sign-out-alt"></i><span>Logout</span></button>
+        <button id="theme-toggle" class="sidebar-btn">
+          <i class="fas fa-moon"></i><span>Toggle Theme</span>
+        </button>
+        <button id="logout-btn" class="sidebar-btn">
+          <i class="fa-solid fa-sign-out-alt"></i><span>Logout</span>
+        </button>
       </div>
     </aside>
 
@@ -66,7 +62,8 @@
 
         <section class="user-cards-section">
           <div class="search-controls" style="margin-bottom: 15px;">
-            <input type="text" id="wallet-search" placeholder="Search by name, email, or UID" style="padding: 8px; width: 50%;" />
+            <input type="text" id="wallet-search" placeholder="Search by name, email, or UID"
+              style="padding: 8px; width: 50%;" />
             <select id="account-type-filter" style="padding: 8px;">
               <option value="all">All Account Types</option>
               <option value="mini">Mini</option>
@@ -145,10 +142,10 @@
   </div>
 
   <div id="mobile-overlay" class="mobile-overlay hidden"></div>
-  
+
   <!-- Supabase v2 library -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script type="module" src="./assets/js/admin.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../assets/js/admin-dashboard.js"></script>
 
 </body>
 

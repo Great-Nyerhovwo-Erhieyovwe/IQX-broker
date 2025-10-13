@@ -1,21 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin | Manage Users</title>
 
-  <link rel="stylesheet" href="./assets/css/admin-dashboard.css" />
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-    integrity="sha512-2pczP9zHyaZ3EtnuZlsm+wn9lFzdu0qA7W3rOBTVQkM/9FhKpWzM2c1FRPyq3Hwv16MZwbzPzZB06z/4o1zXag=="
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer"
-  />
+  <link rel="stylesheet" href="../assets/css/admin-dashboard.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 </head>
 
-<body class="light-mode">
+<body class="light-mode loading">
   <div id="dashboard-container">
     <aside id="sidebar">
       <div class="sidebar-header">
@@ -23,21 +18,43 @@
       </div>
       <nav>
         <ul>
-          <li><a href="admin-dashboard.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
-          <li><a href="manage-users.html" class="active"><i class="fa-solid fa-user-gear"></i><span>Manage Users</span></a></li>
+          <li><a href="dashboard.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+          <li><a href="users.html" class="active"><i class="fas fa-users"></i><span>Manage User</span></a></li>
+          <li><a href="wallet.html"><i class="fas fa-wallet"></i><span>Manage Wallet</span></a></li>
+          <li><a href="overview.html"><i class="fa-solid fa-users"></i><span>Users Overview</span></a></li>
           <li><a href="transaction.html"><i class="fa-solid fa-wallet"></i><span>Transactions</span></a></li>
         </ul>
       </nav>
+
       <div class="sidebar-footer">
-        <button id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        <button id="theme-toggle" class="sidebar-btn">
+          <i class="fas fa-moon"></i><span>Toggle Theme</span>
+        </button>
+        <button id="logout-btn" class="sidebar-btn">
+          <i class="fa-solid fa-sign-out-alt"></i><span>Logout</span>
+        </button>
       </div>
     </aside>
 
     <div id="main-content">
-      <header class="navbar">
+      <header id="navbar" class="navbar">
         <div class="navbar-left">
-          <button id="sidebar-toggle"><i class="fas fa-bars"></i></button>
+          <button id="sidebar-toggle" class="hamburger-btn"><i class="fas fa-bars"></i></button>
           <span class="company-name">IQX Admin</span>
+        </div>
+
+        <div class="navbar-right">
+          <div id="nav-notification"><i class="fa-solid fa-bell"></i></div>
+          <div id="profile-dropdown" class="profile-container">
+            <div class="profile-info">
+              <span id="admin-user-name">Welcome, Admin</span>
+              <img src="https://via.placeholder.com/40" alt="avatar" class="profile-avatar" />
+            </div>
+            <div class="dropdown-menu hidden">
+              <a href="settings.html">Settings</a>
+              <a href="#" id="dropdown-logout">Logout</a>
+            </div>
+          </div>
         </div>
       </header>
 
@@ -113,9 +130,10 @@
       </form>
     </div>
   </div>
-  
+
   <!-- Supabase v2 library -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script type="module" src="./assets/js/admin.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../assets/js/admin-dashboard.js"></script>
 </body>
+
 </html>

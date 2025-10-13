@@ -1,20 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin | IQX Dashboard</title>
-  <link rel="stylesheet" href="./assets/css/admin-dashboard.css" />
-  <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-    integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoE7cC5XWf3Zx+7P1d5u1M6+Zef3zq0n+d2Q=="
-    crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-  <style>
-    .light-mode { background-color: #f4f7f6; }
-    .sidebar-header h2 { color: #0dcaf0; }
-    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #fff; border-bottom: 1px solid #ddd; }
-  </style>
+  <link rel="stylesheet" href="../assets/css/admin-dashboard.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 </head>
 
 <body class="light-mode loading">
@@ -25,9 +17,11 @@
       </div>
       <nav>
         <ul>
-          <li><a href="#" class="active"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
-          <li><a href="manage-users.html"><i class="fa-solid fa-users-gear"></i><span>Manage Users</span></a></li>
-          <li><a href="transactions.html"><i class="fa-solid fa-chart-line"></i><span>Transactions</span></a></li>
+          <li><a href="dashboard.html" class="active"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+          <li><a href="users.html"><i class="fas fa-users"></i><span>Manage User</span></a></li>
+          <li><a href="wallet.html"><i class="fas fa-wallet"></i><span>Manage Wallet</span></a></li>
+          <li><a href="overview.html"><i class="fa-solid fa-users"></i><span>Users Overview</span></a></li>
+          <li><a href="transaction.html"><i class="fa-solid fa-wallet"></i><span>Transactions</span></a></li>
         </ul>
       </nav>
 
@@ -123,4 +117,5 @@
   <!-- ✅ Admin JS Logic -->
   <script src="../assets/js/admin-dashboard.js"></script>
 </body>
+
 </html>
