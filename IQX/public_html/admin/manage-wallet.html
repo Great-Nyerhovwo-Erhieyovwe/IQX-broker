@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin | Wallet & Verification</title>
+
+  <link rel="stylesheet" href="./assets/css/admin-dashboard.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    integrity="sha512-pO12rT+DcL5n3ePxx5hR2TFWReS+UxZ35uR9Y9Af8HzlxVfKfFQ8eOi5GK3nLkAfiL0+6Bz/J6E4jqG4lgFj1g=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <style>
+    .loading #dashboard-container { display: none; }
+    .light-mode { background-color: #f4f7f6; }
+    .user-card { background: #fff; padding: 15px; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+    .user-info { display: flex; flex-direction: column; gap: 3px; }
+    .user-actions button { margin-left: 5px; }
+  </style>
+</head>
+
+<body class="light-mode loading">
+
+  <div id="dashboard-container">
+
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header"><h2>IQX Admin</h2></div>
+      <nav id="sidebar-menu">
+        <ul>
+          <li><a href="admin-dashboard.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+          <li><a href="manage-users.html"><i class="fa-solid fa-user-gear"></i><span>Manage Users</span></a></li>
+          <li><a href="wallet-verification.html" class="active"><i class="fa-solid fa-wallet"></i><span>Wallet & Verification</span></a></li>
+          <li><a href="transactions.html"><i class="fa-solid fa-list"></i><span>Transactions</span></a></li>
+        </ul>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="theme-toggle" class="sidebar-btn"><i class="fas fa-moon"></i><span>Toggle Theme</span></button>
+        <button id="logout-btn" class="sidebar-btn profile-sidebar-btn"><i class="fas fa-sign-out-alt"></i><span>Logout</span></button>
+      </div>
+    </aside>
+
+    <div id="main-content">
+      <header id="navbar" class="navbar">
+        <div class="navbar-left">
+          <button id="sidebar-toggle" class="hamburger-btn"><i class="fas fa-bars"></i></button>
+          <span class="company-name">IQX Admin</span>
+        </div>
+        <div class="navbar-right">
+          <div id="nav-notification"><i class="fa-solid fa-bell"></i></div>
+          <div id="profile-dropdown" class="profile-container">
+            <div class="profile-info">
+              <span class="user-name" id="admin-user-name">Welcome, Admin</span>
+              <img src="https://via.placeholder.com/40" alt="avatar" class="profile-avatar" />
+            </div>
+            <div class="dropdown-menu hidden">
+              <a href="#" id="dropdown-settings">Settings</a>
+              <a href="#" id="dropdown-logout">Logout</a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main id="content">
+        <h3 id="page-title">Wallet & Verification Management</h3>
+
+        <section class="user-cards-section">
+          <div class="search-controls" style="margin-bottom: 15px;">
+            <input type="text" id="wallet-search" placeholder="Search by name, email, or UID" style="padding: 8px; width: 50%;" />
+            <select id="account-type-filter" style="padding: 8px;">
+              <option value="all">All Account Types</option>
+              <option value="mini">Mini</option>
+              <option value="premium">Premium</option>
+              <option value="platinum">Platinum</option>
+              <option value="co-investment">Co-Investment</option>
+            </select>
+            <select id="verification-filter" style="padding: 8px;">
+              <option value="all">All Verification Status</option>
+              <option value="verified">Verified</option>
+              <option value="unverified">Unverified</option>
+            </select>
+          </div>
+
+          <div id="users-cards-container">
+            <!-- Example card, replace dynamically with Supabase data -->
+            <div class="user-card">
+              <div class="user-info">
+                <span><strong>Name:</strong> John Doe</span>
+                <span><strong>Email:</strong> johndoe@example.com</span>
+                <span><strong>UID:</strong> abc123</span>
+                <span><strong>Account Type:</strong> Premium</span>
+                <span><strong>Wallet Address:</strong> 1A2b3C4d5E6f...</span>
+                <span><strong>Verification:</strong> Verified</span>
+              </div>
+              <div class="user-actions">
+                <button class="btn-primary" data-action="edit" data-uid="abc123">Edit</button>
+              </div>
+            </div>
+            <!-- more user cards injected here -->
+          </div>
+        </section>
+      </main>
+    </div>
+
+  </div>
+
+  <!-- Modal: Update Wallet / Verification -->
+  <div id="wallet-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <span class="close-btn">&times;</span>
+      <h3 id="modal-user-title">Manage User Wallet & Verification</h3>
+
+      <form id="wallet-verification-form">
+        <input type="hidden" id="modal-user-uid" />
+
+        <!-- Wallet Address -->
+        <div class="form-group">
+          <label for="modal-wallet-address">Wallet Address:</label>
+          <input type="text" id="modal-wallet-address" placeholder="Enter wallet address" />
+        </div>
+
+        <!-- Account Type -->
+        <div class="form-group">
+          <label for="modal-account-type">Account Type:</label>
+          <select id="modal-account-type">
+            <option value="mini">Mini</option>
+            <option value="premium">Premium</option>
+            <option value="platinum">Platinum</option>
+            <option value="co-investment">Co-Investment</option>
+          </select>
+        </div>
+
+        <!-- Verification Status -->
+        <div class="form-group">
+          <label for="modal-verification-status">Verification Status:</label>
+          <select id="modal-verification-status">
+            <option value="unverified">Unverified</option>
+            <option value="verified">Verified</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn-primary">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="mobile-overlay" class="mobile-overlay hidden"></div>
+
+</body>
+
+</html>
