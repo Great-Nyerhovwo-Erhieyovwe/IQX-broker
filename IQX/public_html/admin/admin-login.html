@@ -4,35 +4,34 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Login | IQX</title>
-  
-   <link rel="stylesheet" href="./assets/css/admin.css" />
+  <link rel="stylesheet" href="./assets/css/admin.css" />
 </head>
-
 <body>
   <div class="admin-login-container">
-    <h2>Admin - Login</h2>
+    <h2>Admin Login</h2>
 
-    <!-- HTML snippet (admin-login.html) -->
-<form id="adminLoginForm">
-  <div class="form-group">
-    <label for="adminEmail">Admin Email</label>
-    <input type="email" id="adminEmail" placeholder="Enter your admin email" required />
+    <form id="adminLoginForm">
+      <div class="form-group">
+        <label for="adminEmail">Admin Email</label>
+        <input type="email" id="adminEmail" placeholder="Enter your admin email" required />
+      </div>
+
+      <div class="form-group">
+        <label for="adminPassword">Password</label>
+        <input type="password" id="adminPassword" placeholder="Enter your password" required />
+      </div>
+
+      <!-- Use type="button" to avoid native form submission -->
+      <button type="button" id="adminLoginBtn">Login</button>
+
+      <p id="adminLoginMsg" class="status-msg"></p>
+    </form>
   </div>
 
-  <div class="form-group">
-    <label for="adminPassword">Password</label>
-    <input type="password" id="adminPassword" placeholder="Enter your password" required />
-  </div>
+  <!-- Supabase v2 Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <button id="adminLoginBtn">Login</button>
-  <p id="adminLoginMsg" class="status-msg"></p>
-</form>
-
-
-  </div>
-
- <!-- Supabase v2 library -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script type="module" src="./assets/js/admin.js"></script>
+  <!-- Custom JS -->
+  <script type="module" src="./assets/js/admin.js"></script>
 </body>
 </html>
