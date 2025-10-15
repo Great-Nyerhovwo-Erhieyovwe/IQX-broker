@@ -58,41 +58,75 @@
         }
 
         body {
-            font-family: 'Inter', Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: var(--bg-color);
-            color: var(--primary-text);
+            color: var(--text-color);
             transition: background-color 0.3s ease, color 0.3s ease;
+            overflow: hidden;
+            /* Keeps scrollbars from appearing when sidebar is fixed/collapsed */
             line-height: 1.5;
         }
 
         #dashboard-container {
-            display: grid;
-            transition: grid-template-columns 0.3s ease, --current-sidebar-width 0.3s ease;
-            grid-template-columns: var(--current-sidebar-width) 1fr;
-            grid-template-rows: 60px 1fr;
+            /* On mobile, this will be block, then overwritten by grid on desktop */
+            display: block;
             height: 100vh;
             overflow: hidden;
         }
 
+
+        /* --- MOBILE LAYOUT (DEFAULT STATE: Screen width < 768px) --- */
+
         #sidebar {
-            grid-area: 1 / 1 / 3 / 2;
-            /* FIX: Applied grid area */
+            /* 1. Mobile Default: Fixed position, full height, moved off-screen */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            /* Fixed width on mobile */
+            height: 100%;
+            z-index: 1000;
+            transform: translateX(-100%);
+            /* Initial state: fully off-screen */
+            transition: transform 0.3s ease-in-out;
+            /* Keep existing visual styles */
             background-color: var(--sidebar-bg);
             color: var(--sidebar-text);
             border-right: 1px solid var(--border-color);
             padding: 20px 0;
-            height: 100vh;
             overflow-y: auto;
             overflow-x: hidden;
             flex-shrink: 0;
             display: flex;
             flex-direction: column;
-            transition: all 0.3s ease;
         }
 
-        #dashboard-container.sidebar-collapsed {
-            --current-sidebar-width: var(--sidebar-width-closed);
+        /* 2. Mobile Active: When JS adds the class, slide it into view */
+        #dashboard-container.sidebar-collapsed #sidebar {
+            transform: translateX(0);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+            /* Add shadow for mobile visibility */
         }
+
+        /* --- Mobile Overlay Styling --- */
+        #mobile-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 999;
+            display: none;
+            /* Hidden by default */
+            transition: opacity 0.3s;
+        }
+
+        /* Show overlay when sidebar is open on mobile */
+        #dashboard-container.sidebar-collapsed #mobile-overlay {
+            display: block;
+        }
+
 
         .sidebar-header {
             text-align: center;
