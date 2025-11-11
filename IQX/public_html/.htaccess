@@ -1,0 +1,25 @@
+# Prevent direct access to sensitive files
+<FilesMatch "\.(env|sql|ini|log|bak|config)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Protect backend folders
+<Directory "/api">
+    Order deny,allow
+    Deny from all
+</Directory>
+
+# Turn on Rewrite Engine for pretty URLs (optional)
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+# Redirect all requests to index.php if needed
+# RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+
+# Set default charset and security headers
+AddDefaultCharset UTF-8
+Header always set X-Content-Type-Options "nosniff"
+Header always set X-Frame-Options "SAMEORIGIN"
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
+Header always set X-XSS-Protection "1; mode=block"

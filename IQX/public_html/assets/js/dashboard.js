@@ -1,7 +1,7 @@
 // dashboard-supabase.js — Full Supabase migration (copy/paste)
 // Replace with your Supabase values OR create client globally and remove the createClient call.
-const SUPABASE_URL = 'https://aqotnpbcrqaiqonpfshj.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFxb3RucGJjcnFhaXFvbnBmc2hqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDUwNDMsImV4cCI6MjA3NTQ4MTA0M30.rqwwCxMp2PBydSE99QJOL-nt1UjxkI7-ea0Q8Wk5SVI';
+const SUPABASE_URL = 'https://wreyaigjuecupzqysvfo.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndyZXlhaWdqdWVjdXB6cXlzdmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI4NTA2MzMsImV4cCI6MjA3ODQyNjYzM30.9ZKL97aUU_z1-b79JZIYUKTORRCsPt0yjZhuGRV48uY';
 
 document.addEventListener('DOMContentLoaded', async () => {
   // --- Ensure Supabase client available ---
@@ -149,7 +149,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   function subscribeWalletConfig() {
     // Unsubscribe existing
     if (CHANNELS.config) {
-      CHANNELS.config.unsubscribe?.().catch(()=>{});
+      CHANNELS.config.unsubscribe?.().catch(() => { });
       CHANNELS.config = null;
     }
     try {
@@ -250,8 +250,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (data && data.address) {
       walletAddressDisplay.textContent = data.address;
       if (copyAddressBtn) {
-          copyAddressBtn.style.display = 'inline-block'; // Show copy button
-          copyAddressBtn.setAttribute('data-address', data.address);
+        copyAddressBtn.style.display = 'inline-block'; // Show copy button
+        copyAddressBtn.setAttribute('data-address', data.address);
       }
     } else {
       walletAddressDisplay.textContent = 'Configuration not available.';
@@ -286,7 +286,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   function subscribeUserProfile(uid) {
     if (!uid) return;
     if (CHANNELS.user) {
-      CHANNELS.user.unsubscribe?.().catch(()=>{});
+      CHANNELS.user.unsubscribe?.().catch(() => { });
       CHANNELS.user = null;
     }
     try {
@@ -342,7 +342,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           const isSuccess = tx.status === 'approved';
           showPopup(`${action} of ${formatUSD(tx.amount)} was ${isSuccess ? 'approved ✅' : 'declined ❌'}`, isSuccess);
           notifiedTxIds.add(tx.id);
-          try { localStorage.setItem(`notifiedTransactions_${uid}`, JSON.stringify([...notifiedTxIds])); } catch (e) {}
+          try { localStorage.setItem(`notifiedTransactions_${uid}`, JSON.stringify([...notifiedTxIds])); } catch (e) { }
         }
       });
     } catch (err) {
@@ -353,7 +353,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   function subscribeTransactions(uid) {
     if (!uid) return;
     if (CHANNELS.tx) {
-      CHANNELS.tx.unsubscribe?.().catch(()=>{});
+      CHANNELS.tx.unsubscribe?.().catch(() => { });
       CHANNELS.tx = null;
     }
     try {
@@ -371,7 +371,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               const action = (newRow.type || '').charAt(0).toUpperCase() + (newRow.type || '').slice(1);
               showPopup(`${action} of ${formatUSD(newRow.amount)} was ${isSuccess ? 'approved ✅' : 'declined ❌'}`, isSuccess);
               notifiedTxIds.add(newRow.id);
-              try { localStorage.setItem(`notifiedTransactions_${uid}`, JSON.stringify([...notifiedTxIds])); } catch (e) {}
+              try { localStorage.setItem(`notifiedTransactions_${uid}`, JSON.stringify([...notifiedTxIds])); } catch (e) { }
             }
           }
         }).subscribe();
@@ -546,8 +546,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         try { window.dashboardChart.destroy(); } catch (e) { /* ignore */ }
       }
 
-      const labels = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-      const dataPoints = [3000,2200,2700,1800,1900,2500,4000,3200,1600,3722,2900,3500];
+      const labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const dataPoints = [3000, 2200, 2700, 1800, 1900, 2500, 4000, 3200, 1600, 3722, 2900, 3500];
 
       window.dashboardChart = new Chart(ctx, {
         type: 'line',
@@ -568,7 +568,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           maintainAspectRatio: false,
           scales: {
             y: {
-              ticks: { callback: value => `$${value/1000}K`, color: '#999' },
+              ticks: { callback: value => `$${value / 1000}K`, color: '#999' },
               grid: { color: '#eee' }
             },
             x: {
@@ -693,14 +693,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // NEW: Copy to clipboard wiring
     if (DOM.copyAddressBtn) {
-        DOM.copyAddressBtn.addEventListener('click', (e) => {
-            const address = e.currentTarget.getAttribute('data-address');
-            if (address) {
-                copyToClipboard(address, 'Wallet address copied! 📋');
-            } else {
-                showPopup('No wallet address to copy.', false);
-            }
-        });
+      DOM.copyAddressBtn.addEventListener('click', (e) => {
+        const address = e.currentTarget.getAttribute('data-address');
+        if (address) {
+          copyToClipboard(address, 'Wallet address copied! 📋');
+        } else {
+          showPopup('No wallet address to copy.', false);
+        }
+      });
     }
   }
 
@@ -739,7 +739,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       try {
         const stored = localStorage.getItem(`notifiedTransactions_${currentUser.id}`);
         if (stored) notifiedTxIds = new Set(JSON.parse(stored));
-      } catch (_) {}
+      } catch (_) { }
 
       // subscribe config & fetch initial
       await fetchWalletConfigOnce();

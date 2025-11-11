@@ -2,8 +2,8 @@
 // assets/js/admin-dashboard.js
 
 // Use global supabase object from v2 library
-const SUPABASE_URL = 'https://aqotnpbcrqaiqonpfshj.supabase.co'; // ← FIXED: removed trailing spaces
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFxb3RucGJjcnFhaXFvbnBmc2hqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDUwNDMsImV4cCI6MjA3NTQ4MTA0M30.rqwwCxMp2PBydSE99QJOL-nt1UjxkI7-ea0Q8Wk5SVI';
+const SUPABASE_URL = 'https://wreyaigjuecupzqysvfo.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndyZXlhaWdqdWVjdXB6cXlzdmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI4NTA2MzMsImV4cCI6MjA3ODQyNjYzM30.9ZKL97aUU_z1-b79JZIYUKTORRCsPt0yjZhuGRV48uY';
 
 // Initialize Supabase client (no conditional — assume CDN is loaded)
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -443,12 +443,12 @@ function setupUILogic() {
       window.location.href = "../admin-login.html";
       return false;
     }
-    const {  { user }, error } = await supabase.auth.getUser();
+    const { data: { user }, error } = await supabase.auth.getUser();
     if (error || !user) {
       window.location.href = "../admin-login.html";
       return false;
     }
-    const {  adminData, error: adminError } = await supabase
+    const { data: adminData, error: adminError } = await supabase
       .from("admins")
       .select("*")
       .eq("id", user.id)
