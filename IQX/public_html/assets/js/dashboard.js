@@ -1,7 +1,7 @@
 // dashboard.js — Full Node.js + Express + Neon migration (copy/paste)
 
 // Configuration
-const API_BASE_URL = 'http://localhost:3000/api'; // Adjust to your backend URL
+const API_BASE_URL = 'https://iqxbackendapi.onrender.com/api'; // Adjust to your backend URL
 const TOKEN_KEY = 'auth_token';
 
 document.addEventListener('DOMContentLoaded', async () => {

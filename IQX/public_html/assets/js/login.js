@@ -1,8 +1,3 @@
-// --- OLD Supabase Setup ---
-// const SUPABASE_URL = 'https://wreyaigjuecupzqysvfo.supabase.co';
-// const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_KEY';
-// const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
 document.addEventListener('DOMContentLoaded', () => {
   // --- DOM Elements ---
   const loginForm = document.getElementById('loginForm');
@@ -67,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       try {
         // --- Call Express Backend ---
-        const res = await fetch('http://localhost:5000/api/login', {
+        const res = await fetch('https://iqxbackendapi.onrender.com/api/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password }),
@@ -98,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const token = localStorage.getItem('iqxToken') || sessionStorage.getItem('iqxToken');
   if (token) {
     // Optionally verify token with backend
-    fetch('http://localhost:5000/api/profile', {
+    fetch('https://iqxbackendapi.onrender.com/api/profile', {
       headers: { Authorization: `Bearer ${token}` }
     })
     .then(r => r.json())

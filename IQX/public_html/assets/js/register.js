@@ -149,7 +149,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
       console.log('Checking username:', name); // Debug log
-      const response = await fetch(`http://localhost:5000/api/check-username?username=${encodeURIComponent(name)}`, {
+      const response = await fetch(`https://iqxbackendapi.onrender.com/api/check-username?username=${encodeURIComponent(name)}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -253,7 +253,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
       // --- Call backend registration route
-      const res = await fetch('http://localhost:5000/api/register', {
+      const res = await fetch('https://iqxbackendapi.onrender.com/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
