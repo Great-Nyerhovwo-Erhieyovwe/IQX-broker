@@ -1,26 +1,16 @@
-// login.js — Complete Supabase v2 version (Production Ready)
-const SUPABASE_URL = 'https://wreyaigjuecupzqysvfo.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndyZXlhaWdqdWVjdXB6cXlzdmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI4NTA2MzMsImV4cCI6MjA3ODQyNjYzM30.9ZKL97aUU_z1-b79JZIYUKTORRCsPt0yjZhuGRV48uY';
+// --- OLD Supabase Setup ---
+// const SUPABASE_URL = 'https://wreyaigjuecupzqysvfo.supabase.co';
+// const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_KEY';
+// const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-document.addEventListener('DOMContentLoaded', async () => {
-  // --- Ensure Supabase loaded ---
-  if (!window.supabase || !window.supabase.createClient) {
-    console.error('Supabase library not loaded. Add this script in HTML head:');
-    console.log('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>');
-    return;
-  }
-
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
+document.addEventListener('DOMContentLoaded', () => {
   // --- DOM Elements ---
   const loginForm = document.getElementById('loginForm');
   const emailInput = document.getElementById('email');
   const passwordInput = document.getElementById('password');
   const togglePwd = document.getElementById('togglePwd');
-  const forgotPasswordLink = document.getElementById('forgotPasswordLink');
   const rememberMeCheckbox = document.getElementById('remember-me');
 
-  // Modal
   const modal = document.getElementById('modal');
   const modalTitle = document.getElementById('modalTitle');
   const modalMessage = document.getElementById('modalMessage');
@@ -28,17 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const modalSpinner = document.getElementById('modalSpinner');
   const closeModalBtn = document.getElementById('closeModal');
 
-  // --- Password toggle ---
-  if (togglePwd && passwordInput) {
-    togglePwd.addEventListener('click', () => {
-      const isPassword = passwordInput.type === 'password';
-      passwordInput.type = isPassword ? 'text' : 'password';
-      togglePwd.classList.toggle('fa-eye', !isPassword);
-      togglePwd.classList.toggle('fa-eye-slash', isPassword);
-    });
-  }
-
-  // --- Modal helper ---
+  // --- Modal Helper ---
   const showModal = (title = '', message = '', isError = true, showSpinner = false) => {
     if (modalTitle) modalTitle.textContent = title;
     if (modalMessage) modalMessage.textContent = message;
@@ -56,30 +36,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (modal) modal.style.display = 'block';
   };
 
+  // Close modal handlers
   if (closeModalBtn) closeModalBtn.addEventListener('click', () => (modal.style.display = 'none'));
   window.addEventListener('click', e => { if (e.target === modal) modal.style.display = 'none'; });
 
-  // --- Forgot Password ---
-  if (forgotPasswordLink) {
-    forgotPasswordLink.addEventListener('click', async e => {
-      e.preventDefault();
-      const email = emailInput.value.trim();
-      if (!email) {
-        showModal('Error', 'Please enter your email to reset password.', true);
-        return;
-      }
-
-      showModal('Sending...', 'Sending password reset link...', false, true);
-      try {
-        const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: window.location.origin + '/reset-password.html'
-        });
-        if (error) throw error;
-        showModal('Success', `Password reset link sent to ${email}.`, false);
-      } catch (err) {
-        console.error(err);
-        showModal('Error', err.message || 'Failed to send reset email.', true);
-      }
+  // --- Password toggle ---
+  if (togglePwd && passwordInput) {
+    togglePwd.addEventListener('click', () => {
+      const isPassword = passwordInput.type === 'password';
+      passwordInput.type = isPassword ? 'text' : 'password';
+      togglePwd.classList.toggle('fa-eye', !isPassword);
+      togglePwd.classList.toggle('fa-eye-slash', isPassword);
     });
   }
 
@@ -96,58 +63,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      showModal('Logging In...', 'Verifying credentials...', false, true);
+      showModal('Logging in...', 'Verifying credentials...', false, true);
 
       try {
-        // ✅ Attempt sign in
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        // --- Call Express Backend ---
+        const res = await fetch('http://localhost:5000/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
 
-        const user = data?.user;
-        const session = data?.session;
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Login failed.');
 
-        if (!user) {
-          showModal('Login Failed', 'Invalid email or password.', true);
-          return;
+        // --- Save JWT token ---
+        if (rememberMe) {
+          localStorage.setItem('iqxToken', data.token);
+        } else {
+          sessionStorage.setItem('iqxToken', data.token);
         }
 
-        // ✅ Save session
-        if (rememberMe)
-          localStorage.setItem('supabaseSession', JSON.stringify(session));
-        else
-          sessionStorage.setItem('supabaseSession', JSON.stringify(session));
-
-        // ✅ Fetch user profile from "users" table
-        const { data: profile, error: profileError } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', user.id)
-          .maybeSingle();
-
-        if (profileError) throw profileError;
-
-        // --- If no profile found (edge case: auth user created but not in users table)
-        if (!profile) {
-          showModal('Incomplete Registration', 'No user profile found. Please register again.', true);
-          await supabase.auth.signOut();
-          return;
-        }
-
-        // --- If banned or frozen
-        if (profile.is_banned) {
-          showModal('Access Denied', 'Your account has been banned.', true);
-          await supabase.auth.signOut();
-          return;
-        }
-
-        if (profile.is_frozen) {
-          showModal('Account Frozen', 'Your account is temporarily frozen. Contact support.', true);
-          await supabase.auth.signOut();
-          return;
-        }
-
-        // ✅ Success — Redirect
-        showModal('Success', `Welcome back, ${profile.username || email}!`, false);
+        // --- Redirect on success ---
+        showModal('Success', `Welcome back, ${data.username || email}!`, false);
         setTimeout(() => window.location.href = '../dashboard/dashboard.html', 1500);
 
       } catch (err) {
@@ -155,5 +92,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         showModal('Login Failed', err.message || 'Invalid email or password.', true);
       }
     });
+  }
+
+  // --- Optional: Check if already logged in ---
+  const token = localStorage.getItem('iqxToken') || sessionStorage.getItem('iqxToken');
+  if (token) {
+    // Optionally verify token with backend
+    fetch('http://localhost:5000/api/profile', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    .then(r => r.json())
+    .then(user => {
+      if (user?.id) window.location.href = '../dashboard/dashboard.html';
+    })
+    .catch(() => {}); // ignore errors
   }
 });

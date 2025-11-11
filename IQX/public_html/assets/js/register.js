@@ -1,18 +1,7 @@
-// register.js — Supabase v2 (Complete, Real Version)
-
-// ✅ Replace these with your actual Supabase project credentials
-const SUPABASE_URL = 'https://wreyaigjuecupzqysvfo.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndyZXlhaWdqdWVjdXB6cXlzdmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI4NTA2MzMsImV4cCI6MjA3ODQyNjYzM30.9ZKL97aUU_z1-b79JZIYUKTORRCsPt0yjZhuGRV48uY';
+// register.js — Node JS + Express + Neon (Complete, Real Version)
 
 // ✅ Initialize after DOM loads
 document.addEventListener('DOMContentLoaded', async () => {
-  if (!window.supabase || !window.supabase.createClient) {
-    console.error('Supabase library not loaded. Please add this in HTML:');
-    console.log('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>');
-    return;
-  }
-
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   // === DOM elements ===
   const form = document.getElementById('registrationForm');
@@ -53,6 +42,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const psi = document.querySelector('.password-strength-indicator');
 
   let isSubmitting = false;
+  let usernameCheckTimeout = null; // For debouncing
 
   // === Helper: Modal ===
   const showModal = (title, message, isError = true, loading = false) => {
@@ -142,31 +132,85 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // === Username Availability ===
   const checkUsernameAvailability = async (name) => {
+    // Clear previous feedback
     usernameFeedback.textContent = '';
     usernameSuggestions.innerHTML = '';
-    if (!name || name.length < 4) return displayError(usernameError, 'Username too short.'), false;
-
-    usernameFeedback.textContent = 'Checking...';
-    const { data, error } = await supabase.from('users').select('id').eq('username', name).limit(1);
-    if (error) return displayError(usernameError, 'Error checking username.'), false;
-
-    if (data.length > 0) {
-      displayError(usernameError, 'Username taken.');
-      usernameFeedback.textContent = 'Taken';
-      usernameFeedback.classList.remove('valid');
-      const base = name.replace(/\d+$/, '');
-      const suggestions = [base + Math.floor(Math.random() * 999), base + '_fx', base + '_2025'];
-      usernameSuggestions.innerHTML = '<strong>Suggestions:</strong><br>' + suggestions.map(s => `<li>${s}</li>`).join('');
-      usernameSuggestions.style.display = 'block';
+    usernameSuggestions.style.display = 'none';
+    
+    if (!name || name.length < 4) {
+      displayError(usernameError, 'Username too short (min 4 characters).');
       return false;
     }
+
+    // Clear error if we have a valid length
     clearError(usernameError);
-    usernameFeedback.textContent = 'Available';
-    usernameFeedback.classList.add('valid');
-    return true;
+    usernameFeedback.textContent = 'Checking...';
+    usernameFeedback.classList.remove('valid');
+
+    try {
+      console.log('Checking username:', name); // Debug log
+      const response = await fetch(`http://localhost:5000/api/check-username?username=${encodeURIComponent(name)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      console.log('Response status:', response.status); // Debug log
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Username check error response:', errorData);
+        displayError(usernameError, errorData.message || 'Error checking username availability.');
+        return false;
+      }
+      
+      const data = await response.json();
+      console.log('Username check response:', data); // Debug log
+      
+      if (data.exists) {
+        displayError(usernameError, 'Username taken.');
+        usernameFeedback.textContent = 'Taken';
+        usernameFeedback.classList.remove('valid');
+        const base = name.replace(/\d+$/, '');
+        const suggestions = [base + Math.floor(Math.random() * 999), base + '_fx', base + '_2025'];
+        usernameSuggestions.innerHTML = '<strong>Suggestions:</strong><br>' + suggestions.map(s => `<li>${s}</li>`).join('');
+        usernameSuggestions.style.display = 'block';
+        return false;
+      } else {
+        clearError(usernameError);
+        usernameFeedback.textContent = 'Available';
+        usernameFeedback.classList.add('valid');
+        return true;
+      }
+    } catch (error) {
+      console.error('Username check error:', error);
+      displayError(usernameError, 'Network error. Please try again.');
+      return false;
+    }
   };
 
-  usernameInput.addEventListener('input', e => checkUsernameAvailability(e.target.value));
+  // Debounced input handler
+  usernameInput.addEventListener('input', (e) => {
+    const name = e.target.value.trim();
+    
+    // Clear any existing timeout
+    if (usernameCheckTimeout) {
+      clearTimeout(usernameCheckTimeout);
+    }
+    
+    // Only check if username is long enough
+    if (name.length >= 4) {
+      usernameCheckTimeout = setTimeout(() => {
+        checkUsernameAvailability(name);
+      }, 500); // Wait 500ms after user stops typing
+    } else {
+      // Clear feedback for short usernames
+      usernameFeedback.textContent = '';
+      usernameSuggestions.style.display = 'none';
+      clearError(usernameError);
+    }
+  });
 
   // === Form Submit ===
   form.addEventListener('submit', async (e) => {
@@ -189,8 +233,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
+    // Perform final username check before submission
     const usernameOK = await checkUsernameAvailability(usernameInput.value.trim());
-    if (!usernameOK) { isSubmitting = false; return; }
+    if (!usernameOK) { 
+      isSubmitting = false; 
+      return; 
+    }
 
     const fullName = fullNameInput.value.trim();
     const email = emailInput.value.trim();
@@ -204,49 +252,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     showModal('Registering...', 'Please wait while we create your account.', false, true);
 
     try {
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { data: { full_name: fullName, username } }
+      // --- Call backend registration route
+      const res = await fetch('http://localhost:5000/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName,
+          username,
+          email,
+          phone,
+          password,
+          accountType,
+          country,
+          currency
+        }),
       });
-      if (authError) throw authError;
 
-      const userId = authData?.user?.id;
-      if (!userId) {
-        showModal('Verify Email', 'Please confirm your email to complete registration.', false);
-        form.reset();
-        isSubmitting = false;
-        return;
-      }
-
-      const { error: insertError } = await supabase.from('users').insert([{
-        id: userId,
-        full_name: fullName,
-        username,
-        email,
-        phone,
-        account_type: accountType,
-        country,
-        currency,
-        balance: 0.0,
-        roi: 0.0,
-        deposits: 0.0,
-        active_trades: 0,
-        is_frozen: false,
-        is_banned: false,
-        created_at: new Date().toISOString()
-      }]);
-
-      if (insertError) throw insertError;
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Registration failed.');
 
       showModal('Success', `Welcome ${username}! Redirecting to login...`, false);
       form.reset();
-      setTimeout(() => (window.location.href = '../login/login.html'), 2000);
+      setTimeout(() => window.location.href = '../login/login.html', 2000);
+
     } catch (err) {
       console.error('Registration Error:', err);
       showModal('Registration Failed', err.message || 'Unexpected error.', true);
-    } finally {
-      isSubmitting = false;
     }
+    
+    isSubmitting = false;
   });
 });

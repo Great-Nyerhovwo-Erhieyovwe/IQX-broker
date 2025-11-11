@@ -1,25 +1,17 @@
-// dashboard-supabase.js — Full Supabase migration (copy/paste)
-// Replace with your Supabase values OR create client globally and remove the createClient call.
-const SUPABASE_URL = 'https://wreyaigjuecupzqysvfo.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndyZXlhaWdqdWVjdXB6cXlzdmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI4NTA2MzMsImV4cCI6MjA3ODQyNjYzM30.9ZKL97aUU_z1-b79JZIYUKTORRCsPt0yjZhuGRV48uY';
+// dashboard.js — Full Node.js + Express + Neon migration (copy/paste)
+
+// Configuration
+const API_BASE_URL = 'http://localhost:3000/api'; // Adjust to your backend URL
+const TOKEN_KEY = 'auth_token';
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // --- Ensure Supabase client available ---
-  if (!window.supabase || !window.supabase.createClient) {
-    console.error('Supabase JS not loaded. Add: <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>');
-    return;
-  }
-  // Create a client (safe to create each page). If you already create one globally, you can reuse it.
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
   // --- App state & channels ---
-  const CHANNELS = { user: null, tx: null, config: null };
   let authSubscription = null;
   let currentUser = null;
   let userProfile = {};
   let notifiedTxIds = new Set();
   let WALLET_CONFIG = {};
-  let tradingViewLoaded = false;
+  let pollingInterval = null;
 
   // --- DOM references (queried once) ---
   const DOM = {
@@ -45,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     coinType: document.getElementById('coinType'),
     networkType: document.getElementById('networkType'),
     walletAddressDisplay: document.getElementById('walletAddressDisplay'),
-    copyAddressBtn: document.getElementById('copyAddressBtn'), // NEW: Copy to clipboard button
+    copyAddressBtn: document.getElementById('copyAddressBtn'),
 
     sidebar: document.getElementById("sidebar"),
     sidebarToggle: document.getElementById("sidebar-toggle"),
@@ -125,48 +117,75 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // ---------- Wallet config (fetch + realtime) ----------
+  // ---------- API Helper Functions ----------
+  async function apiRequest(endpoint, options = {}) {
+    const token = localStorage.getItem(TOKEN_KEY);
+    
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+      },
+      ...options
+    };
+
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+      
+      if (response.status === 401) {
+        // Unauthorized - token likely expired
+        localStorage.removeItem(TOKEN_KEY);
+        window.location.href = '../login/login.html';
+        return null;
+      }
+
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status} - ${response.statusText}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('API request failed:', error);
+      throw error;
+    }
+  }
+
+  // ---------- Wallet config (fetch + polling) ----------
   async function fetchWalletConfigOnce() {
     try {
-      const { data, error } = await supabase
-        .from('config')
-        .select('wallet')
-        .eq('id', 'wallet')
-        .single();
-      if (error && error.code !== 'PGRST116') { // some errors may be due to no row
-        console.warn('wallet config fetch error', error);
-        WALLET_CONFIG = {};
+      const data = await apiRequest('/config/wallet');
+      if (data && data.wallet) {
+        WALLET_CONFIG = data.wallet;
       } else {
-        WALLET_CONFIG = data?.wallet ?? {};
+        WALLET_CONFIG = {};
       }
     } catch (err) {
-      console.error('fetchWalletConfigOnce exception', err);
+      console.error('fetchWalletConfigOnce error', err);
       WALLET_CONFIG = {};
     }
     updateNetworkOptions();
   }
 
-  function subscribeWalletConfig() {
-    // Unsubscribe existing
-    if (CHANNELS.config) {
-      CHANNELS.config.unsubscribe?.().catch(() => { });
-      CHANNELS.config = null;
+  function startWalletConfigPolling() {
+    if (pollingInterval) {
+      clearInterval(pollingInterval);
     }
-    try {
-      CHANNELS.config = supabase
-        .channel(`config-wallet`)
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'config', filter: `id=eq.wallet` }, (payload) => {
-          // payload.new is the updated row
-          if (payload?.new?.wallet) {
-            WALLET_CONFIG = payload.new.wallet;
-          } else {
-            WALLET_CONFIG = {};
-          }
+    
+    pollingInterval = setInterval(async () => {
+      try {
+        const data = await apiRequest('/config/wallet');
+        if (data && data.wallet && JSON.stringify(data.wallet) !== JSON.stringify(WALLET_CONFIG)) {
+          WALLET_CONFIG = data.wallet;
           updateNetworkOptions();
-        }).subscribe();
-    } catch (err) {
-      console.warn('subscribeWalletConfig failed', err);
-    }
+        }
+      } catch (err) {
+        console.error('Polling wallet config failed', err);
+      }
+    }, 10000); // Poll every 10 seconds
   }
 
   // FIX: Reworked to correctly preserve selected coin/network on config update
@@ -259,16 +278,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // ---------- User profile & realtime ----------
-  async function fetchUserProfileOnce(uid) {
+  // ---------- User profile & polling ----------
+  async function fetchUserProfileOnce() {
     try {
-      const { data, error } = await supabase.from('users').select('*').eq('id', uid).single();
-      if (error) throw error;
-      userProfile = data || {};
-      renderProfile();
-      // Ban check
-      if (userProfile.is_banned) {
-        await handleForcedLogout('Your account has been banned. Contact support.');
+      const data = await apiRequest('/user/profile');
+      if (data) {
+        userProfile = data;
+        renderProfile();
+        // Ban check
+        if (userProfile.is_banned) {
+          await handleForcedLogout('Your account has been banned. Contact support.');
+        }
       }
     } catch (err) {
       console.error('fetchUserProfileOnce error', err);
@@ -283,50 +303,38 @@ document.addEventListener('DOMContentLoaded', async () => {
     safeText(DOM.activeDeposit, `${userProfile?.deposits ?? 0} active deposits`);
   }
 
-  function subscribeUserProfile(uid) {
-    if (!uid) return;
-    if (CHANNELS.user) {
-      CHANNELS.user.unsubscribe?.().catch(() => { });
-      CHANNELS.user = null;
+  function startUserProfilePolling() {
+    if (pollingInterval) {
+      clearInterval(pollingInterval);
     }
-    try {
-      CHANNELS.user = supabase
-        .channel(`user-${uid}`)
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'users', filter: `id=eq.${uid}` }, (payload) => {
-          // payload.eventType: INSERT / UPDATE / DELETE
-          if (payload?.new) {
-            userProfile = payload.new;
-            renderProfile();
-            if (userProfile.is_banned) {
-              handleForcedLogout('Your account has been banned. Contact support.');
-            }
-          } else if (payload?.old && !payload?.new) {
-            // user deleted?
-            handleForcedLogout('Your account was removed. Please contact support.');
+    
+    pollingInterval = setInterval(async () => {
+      try {
+        const data = await apiRequest('/user/profile');
+        if (data && JSON.stringify(data) !== JSON.stringify(userProfile)) {
+          userProfile = data;
+          renderProfile();
+          if (userProfile.is_banned) {
+            await handleForcedLogout('Your account has been banned. Contact support.');
           }
-        }).subscribe();
-    } catch (err) {
-      console.error('subscribeUserProfile error', err);
-    }
+        }
+      } catch (err) {
+        console.error('Polling user profile failed', err);
+      }
+    }, 5000); // Poll every 5 seconds
   }
 
-  // ---------- Transactions: fetch & realtime ----------
-  async function fetchTransactionsOnce(uid) {
-    if (!uid) return;
+  // ---------- Transactions: fetch & polling ----------
+  async function fetchTransactionsOnce() {
     try {
       // restore notified ids
       try {
-        const stored = localStorage.getItem(`notifiedTransactions_${uid}`);
+        const stored = localStorage.getItem(`notifiedTransactions_${currentUser?.id}`);
         if (stored) notifiedTxIds = new Set(JSON.parse(stored));
       } catch (e) { console.warn('notified parse', e); }
 
-      const { data: txs = [], error } = await supabase
-        .from('transactions')
-        .select('*')
-        .eq('user_id', uid)
-        .order('created_at', { ascending: false })
-        .limit(20);
-      if (error) throw error;
+      const data = await apiRequest('/transactions');
+      const txs = data || [];
 
       // render latest 5
       DOM.transactionList && (DOM.transactionList.innerHTML = '');
@@ -342,7 +350,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           const isSuccess = tx.status === 'approved';
           showPopup(`${action} of ${formatUSD(tx.amount)} was ${isSuccess ? 'approved ✅' : 'declined ❌'}`, isSuccess);
           notifiedTxIds.add(tx.id);
-          try { localStorage.setItem(`notifiedTransactions_${uid}`, JSON.stringify([...notifiedTxIds])); } catch (e) { }
+          try { localStorage.setItem(`notifiedTransactions_${currentUser?.id}`, JSON.stringify([...notifiedTxIds])); } catch (e) { }
         }
       });
     } catch (err) {
@@ -350,34 +358,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  function subscribeTransactions(uid) {
-    if (!uid) return;
-    if (CHANNELS.tx) {
-      CHANNELS.tx.unsubscribe?.().catch(() => { });
-      CHANNELS.tx = null;
+  function startTransactionPolling() {
+    if (pollingInterval) {
+      clearInterval(pollingInterval);
     }
-    try {
-      CHANNELS.tx = supabase
-        .channel(`transactions-${uid}`)
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions', filter: `user_id=eq.${uid}` }, (payload) => {
-          // For efficiency, handle payload directly when possible
-          const newRow = payload?.new;
-          // If it's insert or update, refresh the small transaction list and notify if status changed to approved/declined
-          fetchTransactionsOnce(uid);
-
-          if (newRow && (newRow.status === 'approved' || newRow.status === 'declined')) {
-            if (!notifiedTxIds.has(newRow.id)) {
-              const isSuccess = newRow.status === 'approved';
-              const action = (newRow.type || '').charAt(0).toUpperCase() + (newRow.type || '').slice(1);
-              showPopup(`${action} of ${formatUSD(newRow.amount)} was ${isSuccess ? 'approved ✅' : 'declined ❌'}`, isSuccess);
-              notifiedTxIds.add(newRow.id);
-              try { localStorage.setItem(`notifiedTransactions_${uid}`, JSON.stringify([...notifiedTxIds])); } catch (e) { }
-            }
-          }
-        }).subscribe();
-    } catch (err) {
-      console.error('subscribeTransactions error', err);
-    }
+    
+    pollingInterval = setInterval(async () => {
+      try {
+        const data = await apiRequest('/transactions');
+        const txs = data || [];
+        
+        // Check for new or updated transactions
+        const hasNewOrUpdated = txs.some(tx => 
+          !notifiedTxIds.has(tx.id) || 
+          tx.status === 'approved' || 
+          tx.status === 'declined'
+        );
+        
+        if (hasNewOrUpdated) {
+          await fetchTransactionsOnce();
+        }
+      } catch (err) {
+        console.error('Polling transactions failed', err);
+      }
+    }, 8000); // Poll every 8 seconds
   }
 
   // ---------- Deposit / Withdraw handlers ----------
@@ -397,18 +401,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     DOM.statusAdd && (DOM.statusAdd.textContent = ' ⏳ Submitting...');
     try {
-      const { error } = await supabase.from('transactions').insert([{
-        user_id: currentUser.id,
-        type: 'deposit',
-        amount,
-        status: 'pending',
-        created_at: new Date().toISOString()
-      }]);
-      if (error) throw error;
+      const response = await apiRequest('/transactions/deposit', {
+        method: 'POST',
+        body: JSON.stringify({ amount })
+      });
+      
       DOM.statusAdd && (DOM.statusAdd.textContent = ' ✅ Request submitted!');
       showPopup(`Deposit of ${formatUSD(amount)} submitted.`, true);
       if (DOM.addAmount) DOM.addAmount.value = '';
       closeModal(DOM.addModal);
+      await fetchTransactionsOnce(); // Refresh transactions
     } catch (err) {
       console.error('handleDepositSubmit error', err);
       DOM.statusAdd && (DOM.statusAdd.textContent = '❌ ' + (err.message || 'Submission failed'));
@@ -446,20 +448,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     DOM.statusWithdraw && (DOM.statusWithdraw.textContent = ' ⏳ Submitting...');
     try {
-      const { error } = await supabase.from('transactions').insert([{
-        user_id: currentUser.id,
-        type: 'withdrawal',
-        amount,
-        wallet_address: walletAddress,
-        status: 'pending',
-        created_at: new Date().toISOString()
-      }]);
-      if (error) throw error;
+      const response = await apiRequest('/transactions/withdraw', {
+        method: 'POST',
+        body: JSON.stringify({ amount, wallet_address: walletAddress })
+      });
+      
       DOM.statusWithdraw && (DOM.statusWithdraw.textContent = ' ✅ Request submitted!');
       showPopup(`Withdrawal of ${formatUSD(amount)} submitted.`, true);
       if (DOM.withdrawAmount) DOM.withdrawAmount.value = '';
       if (walletInput) walletInput.value = '';
       closeModal(DOM.withdrawModal);
+      await fetchTransactionsOnce(); // Refresh transactions
     } catch (err) {
       console.error('handleWithdrawSubmit error', err);
       DOM.statusWithdraw && (DOM.statusWithdraw.textContent = '❌ ' + (err.message || 'Submission failed'));
@@ -707,83 +706,70 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ---------- Auth and bootstrapping ----------
   async function handleForcedLogout(message) {
     try {
-      await supabase.auth.signOut();
+      await apiRequest('/auth/logout', {
+        method: 'POST'
+      });
     } catch (e) { /* ignore */ }
     // cleanup channels & redirect
-    cleanupRealtime();
+    cleanupPolling();
+    localStorage.removeItem(TOKEN_KEY);
     alert(message || 'You have been logged out.');
     window.location.href = '../login/login.html';
   }
 
   async function initAuthAndStart() {
     // Load session user if exists
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (!token) {
+      // No active session - redirect
+      console.warn('No active user session found; redirecting to login.');
+      window.location.href = '../login/login.html';
+      return;
+    }
+
     try {
-      const { data: { user }, error } = await supabase.auth.getUser();
-      if (error) {
-        console.warn('getUser error:', error);
+      // Verify token and get user data
+      const userData = await apiRequest('/user/profile');
+      if (!userData) {
+        throw new Error('Invalid session');
       }
-      if (!user) {
-        // No active session - redirect
-        console.warn('No active user session found; redirecting to login.');
-        window.location.href = '../login/login.html';
-        return;
-      }
+      
       // set current user and start listeners
-      currentUser = user;
-      await fetchUserProfileOnce(currentUser.id);
-      subscribeUserProfile(currentUser.id);
-      await fetchTransactionsOnce(currentUser.id);
-      subscribeTransactions(currentUser.id);
+      currentUser = userData;
+      await fetchUserProfileOnce();
+      await fetchTransactionsOnce();
+      await fetchWalletConfigOnce();
+
+      // Start polling for updates
+      startUserProfilePolling();
+      startTransactionPolling();
+      startWalletConfigPolling();
 
       // restore notified list
       try {
-        const stored = localStorage.getItem(`notifiedTransactions_${currentUser.id}`);
+        const stored = localStorage.getItem(`notifiedTransactions_${currentUser?.id}`);
         if (stored) notifiedTxIds = new Set(JSON.parse(stored));
       } catch (_) { }
 
-      // subscribe config & fetch initial
-      await fetchWalletConfigOnce();
-      subscribeWalletConfig();
-
-      // set up auth state change listener for login/logout events
-      const authState = supabase.auth.onAuthStateChange((event, session) => {
-        if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
-          cleanupRealtime();
-          currentUser = null;
-          window.location.href = '../login/login.html';
-        } else if (event === 'SIGNED_IN' && session?.user) {
-          currentUser = session.user;
-          fetchUserProfileOnce(currentUser.id);
-          subscribeUserProfile(currentUser.id);
-          fetchTransactionsOnce(currentUser.id);
-          subscribeTransactions(currentUser.id);
-        }
-      });
-      // store subscription reference for cleanup
-      authSubscription = authState?.data?.subscription ?? authState;
     } catch (err) {
       console.error('initAuthAndStart error', err);
+      localStorage.removeItem(TOKEN_KEY);
       alert('Authentication error. Please log in again.');
       window.location.href = '../login/login.html';
     }
   }
 
-  function cleanupRealtime() {
-    // unsubscribe channels
-    Object.keys(CHANNELS).forEach(k => {
-      try {
-        CHANNELS[k]?.unsubscribe?.();
-      } catch (e) { /* ignore */ }
-      CHANNELS[k] = null;
-    });
-    // unsubscribe auth
-    try { authSubscription?.unsubscribe?.(); } catch (e) { /* ignore */ }
-    authSubscription = null;
+  function cleanupPolling() {
+    // Clear all polling intervals
+    if (pollingInterval) {
+      clearInterval(pollingInterval);
+      pollingInterval = null;
+    }
   }
 
   // ---------- Before unload cleanup ----------
   window.addEventListener('beforeunload', () => {
-    cleanupRealtime();
+    cleanupPolling();
   });
 
   // ---------- Boot sequence ----------
@@ -794,16 +780,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     initChart();
     wireModalButtons();
 
-    // Wallet config & realtime
-    // These functions are called here, and again in initAuthAndStart for full coverage
-    // await fetchWalletConfigOnce();
-    // subscribeWalletConfig();
-
-    // Auth + realtime user/transactions
+    // Auth + polling user/transactions
     await initAuthAndStart();
 
     // initial debug popup
-    showPopup('Dashboard loaded — real-time enabled', true);
+    showPopup('Dashboard loaded — polling enabled', true);
   } catch (err) {
     console.error('dashboard boot error', err);
   }
