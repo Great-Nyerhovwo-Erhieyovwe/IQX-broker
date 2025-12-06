@@ -1,8 +1,8 @@
 // dashboard.js — Full Node.js + Express + Neon migration (copy/paste)
 
-// Configuration
-const API_BASE_URL = 'https://iqxbackendapi.onrender.com/api'; // Adjust to your backend URL
-const TOKEN_KEY = 'auth_token';
+// Configuration (json-server)
+const API_BASE_URL = 'http://localhost:3000'; // json-server base URL
+const TOKEN_KEY = 'iqxToken';
 
 document.addEventListener('DOMContentLoaded', async () => {
   // --- App state & channels ---
@@ -119,8 +119,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ---------- API Helper Functions ----------
   async function apiRequest(endpoint, options = {}) {
-    const token = localStorage.getItem(TOKEN_KEY);
-    
+    const token = localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY);
+
     const config = {
       headers: {
         'Content-Type': 'application/json',
@@ -129,24 +129,41 @@ document.addEventListener('DOMContentLoaded', async () => {
       ...options
     };
 
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
-    }
-
     try {
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-      
-      if (response.status === 401) {
-        // Unauthorized - token likely expired
-        localStorage.removeItem(TOKEN_KEY);
-        window.location.href = '../login/login.html';
-        return null;
+      // Special-case: profile endpoint -> map to /users/:id using our fake token
+      if (endpoint === '/user/profile') {
+        if (!token) {
+          localStorage.removeItem(TOKEN_KEY);
+          window.location.href = '../login/login.html';
+          return null;
+        }
+        const m = token.match(/^fake-jwt-(\d+)$/);
+        if (!m) {
+          localStorage.removeItem(TOKEN_KEY);
+          window.location.href = '../login/login.html';
+          return null;
+        }
+        const id = m[1];
+        const response = await fetch(`${API_BASE_URL}/users/${id}`);
+        if (!response.ok) throw new Error('Failed to fetch user profile');
+        return await response.json();
       }
+
+      // Special-case: logout (json-server has no auth endpoints)
+      if (endpoint === '/auth/logout') {
+        // simply resolve; cleanup handled by caller
+        return {};
+      }
+
+      // Default behavior: call json-server resource directly. Expect endpoint to start with '/'.
+      const url = `${API_BASE_URL}${endpoint}`;
+      const response = await fetch(url, config);
 
       if (!response.ok) {
         throw new Error(`API Error: ${response.status} - ${response.statusText}`);
       }
 
+      // json-server returns JSON for all resources
       return await response.json();
     } catch (error) {
       console.error('API request failed:', error);
@@ -157,9 +174,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ---------- Wallet config (fetch + polling) ----------
   async function fetchWalletConfigOnce() {
     try {
-      const data = await apiRequest('/config/wallet');
+      const data = await apiRequest('/walletConfig');
       if (data && data.wallet) {
         WALLET_CONFIG = data.wallet;
+      } else if (data && typeof data === 'object') {
+        WALLET_CONFIG = data;
       } else {
         WALLET_CONFIG = {};
       }
@@ -177,9 +196,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     pollingInterval = setInterval(async () => {
       try {
-        const data = await apiRequest('/config/wallet');
-        if (data && data.wallet && JSON.stringify(data.wallet) !== JSON.stringify(WALLET_CONFIG)) {
-          WALLET_CONFIG = data.wallet;
+        const data = await apiRequest('/walletConfig');
+        const newConfig = data && data.wallet ? data.wallet : (data && typeof data === 'object' ? data : {});
+        if (JSON.stringify(newConfig) !== JSON.stringify(WALLET_CONFIG)) {
+          WALLET_CONFIG = newConfig;
           updateNetworkOptions();
         }
       } catch (err) {
@@ -401,9 +421,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     DOM.statusAdd && (DOM.statusAdd.textContent = ' ⏳ Submitting...');
     try {
-      const response = await apiRequest('/transactions/deposit', {
+      const response = await apiRequest('/transactions', {
         method: 'POST',
-        body: JSON.stringify({ amount })
+        body: JSON.stringify({
+          amount,
+          type: 'deposit',
+          userId: currentUser?.id,
+          status: 'pending',
+          created_at: new Date().toISOString()
+        })
       });
       
       DOM.statusAdd && (DOM.statusAdd.textContent = ' ✅ Request submitted!');
@@ -448,9 +474,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     DOM.statusWithdraw && (DOM.statusWithdraw.textContent = ' ⏳ Submitting...');
     try {
-      const response = await apiRequest('/transactions/withdraw', {
+      const response = await apiRequest('/transactions', {
         method: 'POST',
-        body: JSON.stringify({ amount, wallet_address: walletAddress })
+        body: JSON.stringify({
+          amount,
+          type: 'withdraw',
+          wallet_address: walletAddress,
+          userId: currentUser?.id,
+          status: 'pending',
+          created_at: new Date().toISOString()
+        })
       });
       
       DOM.statusWithdraw && (DOM.statusWithdraw.textContent = ' ✅ Request submitted!');

@@ -1,12 +1,33 @@
 
 // assets/js/admin-dashboard.js
 
-// Use global supabase object from v2 library
-const SUPABASE_URL = 'https://wreyaigjuecupzqysvfo.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndyZXlhaWdqdWVjdXB6cXlzdmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI4NTA2MzMsImV4cCI6MjA3ODQyNjYzM30.9ZKL97aUU_z1-b79JZIYUKTORRCsPt0yjZhuGRV48uY';
+// assets/js/admin-dashboard.js
 
-// Initialize Supabase client (no conditional — assume CDN is loaded)
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// json-server base
+const API_BASE = 'http://localhost:3000';
+const ADMIN_TOKEN_KEY = 'iqxAdminToken';
+
+// Helper fetch wrappers
+async function getJson(path) {
+  const r = await fetch(`${API_BASE}${path}`);
+  if (!r.ok) throw new Error(`GET ${path} failed: ${r.status}`);
+  return r.json();
+}
+async function postJson(path, body) {
+  const r = await fetch(`${API_BASE}${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  if (!r.ok) throw new Error(`POST ${path} failed: ${r.status}`);
+  return r.json();
+}
+async function patchJson(path, body) {
+  const r = await fetch(`${API_BASE}${path}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  if (!r.ok) throw new Error(`PATCH ${path} failed: ${r.status}`);
+  return r.json();
+}
+async function deleteJson(path) {
+  const r = await fetch(`${API_BASE}${path}`, { method: 'DELETE' });
+  if (!r.ok) throw new Error(`DELETE ${path} failed: ${r.status}`);
+  return r.json();
+}
 
 // Global state
 let allUsers = [];
@@ -97,9 +118,9 @@ function setupUILogic() {
   if (modalCloseBtn && walletModal) {
     modalCloseBtn.addEventListener('click', () => walletModal.style.display = "none");
   }
-  const mobileOverlay = document.getElementById("mobile-overlay");
-  if (mobileOverlay && walletModal) {
-    mobileOverlay.addEventListener('click', () => walletModal.style.display = "none");
+  const mobileOverlayElem = document.getElementById("mobile-overlay");
+  if (mobileOverlayElem && walletModal) {
+    mobileOverlayElem.addEventListener('click', () => walletModal.style.display = "none");
   }
 
   // Action modal close
@@ -124,8 +145,9 @@ function setupUILogic() {
 
   // Logout
   if (logoutBtn) {
-    logoutBtn.addEventListener("click", async () => {
-      await supabase.auth.signOut();
+    logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem(ADMIN_TOKEN_KEY);
+      sessionStorage.removeItem(ADMIN_TOKEN_KEY);
       window.location.href = "../admin-login.html";
     });
   }
@@ -167,34 +189,46 @@ function setupUILogic() {
         if (isNaN(balanceNum) || balanceNum < 0) {
           return showMessage("Invalid balance entered. Must be a positive number.", "error");
         }
-        const { error } = await supabase.from("users").update({ balance: balanceNum }).eq("id", userId);
-        if (error) return showMessage("Failed to update balance", "error");
-        showMessage("Balance updated");
-        fetchAllUsers();
+        try {
+          await patchJson(`/users/${encodeURIComponent(userId)}`, { balance: balanceNum });
+          showMessage("Balance updated");
+          await fetchAllUsers();
+        } catch (e) {
+          console.error('Update balance failed', e);
+          showMessage('Failed to update balance', 'error');
+        }
       });
     });
 
     document.querySelectorAll(".toggle-ban-btn").forEach(btn => {
       btn.addEventListener("click", async () => {
         const userId = btn.dataset.userid;
-        const user = allUsers.find(u => u.id === userId);
+        const user = allUsers.find(u => String(u.id) === String(userId));
         if (!user) return;
-        const { error } = await supabase.from("users").update({ isBanned: !user.isBanned }).eq("id", userId);
-        if (error) return showMessage("Failed to toggle ban", "error");
-        showMessage(`User ${!user.isBanned ? "banned" : "unbanned"}.`);
-        fetchAllUsers();
+        try {
+          await patchJson(`/users/${encodeURIComponent(userId)}`, { is_banned: !user.isBanned });
+          showMessage(`User ${!user.isBanned ? "banned" : "unbanned"}.`);
+          await fetchAllUsers();
+        } catch (e) {
+          console.error('Toggle ban failed', e);
+          showMessage('Failed to toggle ban', 'error');
+        }
       });
     });
 
     document.querySelectorAll(".toggle-freeze-btn").forEach(btn => {
       btn.addEventListener("click", async () => {
         const userId = btn.dataset.userid;
-        const user = allUsers.find(u => u.id === userId);
+        const user = allUsers.find(u => String(u.id) === String(userId));
         if (!user) return;
-        const { error } = await supabase.from("users").update({ isFrozen: !user.isFrozen }).eq("id", userId);
-        if (error) return showMessage("Failed to toggle freeze", "error");
-        showMessage(`User ${!user.isFrozen ? "frozen" : "unfrozen"}.`);
-        fetchAllUsers();
+        try {
+          await patchJson(`/users/${encodeURIComponent(userId)}`, { is_frozen: !user.isFrozen });
+          showMessage(`User ${!user.isFrozen ? "frozen" : "unfrozen"}.`);
+          await fetchAllUsers();
+        } catch (e) {
+          console.error('Toggle freeze failed', e);
+          showMessage('Failed to toggle freeze', 'error');
+        }
       });
     });
 
@@ -202,10 +236,14 @@ function setupUILogic() {
       btn.addEventListener("click", async () => {
         const userId = btn.dataset.userid;
         if (!showConfirmation("Are you sure you want to delete this user? This action cannot be undone.")) return;
-        const { error } = await supabase.from("users").delete().eq("id", userId);
-        if (error) return showMessage("Failed to delete user", "error");
-        showMessage("User deleted");
-        fetchAllUsers();
+        try {
+          await deleteJson(`/users/${encodeURIComponent(userId)}`);
+          showMessage("User deleted");
+          await fetchAllUsers();
+        } catch (e) {
+          console.error('Delete user failed', e);
+          showMessage('Failed to delete user', 'error');
+        }
       });
     });
   }
@@ -213,7 +251,7 @@ function setupUILogic() {
   function renderFilteredWalletUsers() {
     if (!walletUserContainer || !searchInput || !accountFilter || !verificationFilter || !statusFilter) return;
 
-    const searchTerms = searchInput.value.toLowerCase();
+    const searchTerms = (searchInput.value || '').toLowerCase();
     const accFilter = accountFilter.value;
     const verFilter = verificationFilter.value;
     const statusFilt = statusFilter.value;
@@ -221,10 +259,11 @@ function setupUILogic() {
     walletUserContainer.innerHTML = '';
 
     const filtered = allUsers.filter(user => {
-      const matchesSearch = user.username?.toLowerCase().includes(searchTerms) || user.email?.toLowerCase().includes(searchTerms) || user.id?.toLowerCase().includes(searchTerms);
-      const matchesAccount = accFilter === "all" || user.account_type === accFilter;
-      const matchesVerification = verFilter === "all" || user.verification === verFilter;
-      const matchesStatus = statusFilt === 'all' || user.status?.toLowerCase() === statusFilt;
+      const idStr = String(user.id || '');
+      const matchesSearch = (user.username || '').toLowerCase().includes(searchTerms) || (user.email || '').toLowerCase().includes(searchTerms) || idStr.toLowerCase().includes(searchTerms);
+      const matchesAccount = accFilter === "all" || (user.account_type || '') === accFilter;
+      const matchesVerification = verFilter === "all" || (user.verification || '') === verFilter;
+      const matchesStatus = statusFilt === 'all' || (user.status || '').toLowerCase() === statusFilt;
       return matchesSearch && matchesAccount && matchesVerification && matchesStatus;
     });
 
@@ -265,7 +304,7 @@ function setupUILogic() {
       const btn = e.target.closest('button[data-action="edit"]');
       if (!btn || !walletModal) return;
       const uid = btn.dataset.uid;
-      const user = allUsers.find(u => u.id === uid);
+      const user = allUsers.find(u => String(u.id) === String(uid));
       if (!user) return;
       modalUidInput.value = user.id;
       modalWalletInput.value = user.wallet || '';
@@ -284,24 +323,25 @@ function setupUILogic() {
       const updatedWallet = modalWalletInput.value.trim();
       const updatedAccount = modalAccountSelect.value;
       const updatedVerification = modalVerificationSelect.value;
-      const { error } = await supabase.from("users").update({
-        wallet: updatedWallet,
-        account_type: updatedAccount,
-        verification: updatedVerification
-      }).eq("id", uid);
-      if (error) {
-        showMessage('Wallet update failed: ' + error.message, 'error');
-        return;
+      try {
+        await patchJson(`/users/${encodeURIComponent(uid)}`, {
+          wallet: updatedWallet,
+          account_type: updatedAccount,
+          verification: updatedVerification
+        });
+        const userIndex = allUsers.findIndex(u => String(u.id) === String(uid));
+        if (userIndex > -1) {
+          allUsers[userIndex].wallet = updatedWallet;
+          allUsers[userIndex].account_type = updatedAccount;
+          allUsers[userIndex].verification = updatedVerification;
+        }
+        renderFilteredWalletUsers();
+        walletModal.style.display = "none";
+        showMessage("Wallet and verification status updated successfully.");
+      } catch (err) {
+        console.error('Wallet update failed', err);
+        showMessage('Wallet update failed', 'error');
       }
-      const userIndex = allUsers.findIndex(u => u.id === uid);
-      if (userIndex > -1) {
-        allUsers[userIndex].wallet = updatedWallet;
-        allUsers[userIndex].account_type = updatedAccount;
-        allUsers[userIndex].verification = updatedVerification;
-      }
-      renderFilteredWalletUsers();
-      walletModal.style.display = "none";
-      showMessage("Wallet and verification status updated successfully.");
     });
   }
 
@@ -311,7 +351,7 @@ function setupUILogic() {
       const editBtn = e.target.closest('.edit-btn');
       if (!editBtn || !actionModal) return;
       const userId = editBtn.dataset.uid;
-      const user = allUsers.find(u => u.id === userId);
+      const user = allUsers.find(u => String(u.id) === String(userId));
       if (!user) return;
       actionModalUserId.value = user.id;
       newBalanceInput.value = user.balance || 0;
@@ -329,19 +369,20 @@ function setupUILogic() {
       let balance = parseFloat(newBalanceInput.value);
       const action = balanceActionSelect.value;
       const status = accountStatusSelect.value;
-      const user = allUsers.find(u => u.id === uid);
+      const user = allUsers.find(u => String(u.id) === String(uid));
       if (!user) return;
       if (isNaN(balance)) return showMessage("Invalid balance amount entered.", "error");
       if (action === 'add') balance = (user.balance || 0) + balance;
       else if (action === 'subtract') balance = (user.balance || 0) - balance;
-      const { error } = await supabase.from('users').update({ balance, status }).eq('id', uid);
-      if (error) {
-        console.error('Update failed:', error);
+      try {
+        await patchJson(`/users/${encodeURIComponent(uid)}`, { balance, status });
+        const index = allUsers.findIndex(u => String(u.id) === String(uid));
+        allUsers[index] = { ...allUsers[index], balance, status };
+      } catch (err) {
+        console.error('Update failed:', err);
         showMessage('Failed to update user balance/status.', 'error');
         return;
       }
-      const index = allUsers.findIndex(u => u.id === uid);
-      allUsers[index] = { ...allUsers[index], balance, status };
       renderFilteredWalletUsers();
       if (overviewUserContainer) renderOverviewUsers();
       actionModal.style.display = 'none';
@@ -349,7 +390,7 @@ function setupUILogic() {
     });
   }
 
-  // Freeze/Ban buttons (note: these buttons don't exist in your render code — so this may be dead code)
+  // Freeze/Ban buttons
   if (walletUserContainer) {
     walletUserContainer.addEventListener('click', async e => {
       const freezeBtn = e.target.closest('.freeze-btn');
@@ -357,17 +398,17 @@ function setupUILogic() {
       if (!freezeBtn && !banBtn) return;
       const uid = (freezeBtn || banBtn).dataset.uid;
       const newStatus = freezeBtn ? 'frozen' : 'banned';
-      const { error } = await supabase.from('users').update({ status: newStatus }).eq('id', uid);
-      if (error) {
-        console.error(`Failed to set status ${newStatus}:`, error);
+      try {
+        await patchJson(`/users/${encodeURIComponent(uid)}`, { status: newStatus });
+        const index = allUsers.findIndex(u => String(u.id) === String(uid));
+        allUsers[index].status = newStatus;
+        renderFilteredWalletUsers();
+        if (overviewUserContainer) renderOverviewUsers();
+        showMessage(`User status set to ${newStatus}.`);
+      } catch (err) {
+        console.error(`Failed to set status ${newStatus}:`, err);
         showMessage('Failed to update status.', 'error');
-        return;
       }
-      const index = allUsers.findIndex(u => u.id === uid);
-      allUsers[index].status = newStatus;
-      renderFilteredWalletUsers();
-      if (overviewUserContainer) renderOverviewUsers();
-      showMessage(`User status set to ${newStatus}.`);
     });
   }
 
@@ -375,18 +416,22 @@ function setupUILogic() {
   // Transactions
   // -------------------------
   async function fetchTransactions() {
-    if (!supabase || !txContainer) return;
-    const { data, error } = await supabase.from("transactions").select("*").eq("status", "pending");
-    if (error) return showMessage("Failed to load transactions", "error");
-    transactions = data;
-    renderTransactions();
+    if (!txContainer) return;
+    try {
+      const data = await getJson('/transactions?status=pending');
+      transactions = data || [];
+      renderTransactions();
+    } catch (err) {
+      console.error('Failed to load transactions', err);
+      showMessage('Failed to load transactions', 'error');
+    }
   }
 
   function renderTransactions() {
     if (!txContainer) return;
     txContainer.innerHTML = "";
     transactions.forEach(tx => {
-      const user = allUsers.find(u => u.id === tx.userId);
+      const user = allUsers.find(u => String(u.id) === String(tx.userId));
       const card = document.createElement("div");
       card.className = "tx-card p-4 mb-2 bg-yellow-50 rounded-lg shadow";
       card.innerHTML = `
@@ -407,30 +452,41 @@ function setupUILogic() {
     document.querySelectorAll(".approve-tx-btn").forEach(btn => {
       btn.addEventListener("click", async () => {
         const txId = btn.dataset.txid;
-        const tx = transactions.find(t => t.id === txId);
+        const tx = transactions.find(t => String(t.id) === String(txId));
         if (!tx) return;
-        const user = allUsers.find(u => u.id === tx.userId);
+        const user = allUsers.find(u => String(u.id) === String(tx.userId));
         if (!user) return showMessage("User not found for transaction", "error");
-        let newBalance = Number(user.balance);
-        if (tx.type === "deposit") newBalance += Number(tx.amount);
-        else if (tx.type === "withdrawal") {
-          if (Number(tx.amount) > newBalance) return showMessage("Insufficient balance for withdrawal", "error");
-          newBalance -= Number(tx.amount);
+        let newBalance = Number(user.balance || 0);
+        const isWithdrawal = /withdraw/i.test(tx.type || '');
+        if (/deposit/i.test(tx.type || '')) newBalance += Number(tx.amount || 0);
+        else if (isWithdrawal) {
+          if (Number(tx.amount || 0) > newBalance) return showMessage("Insufficient balance for withdrawal", "error");
+          newBalance -= Number(tx.amount || 0);
         }
-        await supabase.from("users").update({ balance: newBalance }).eq("id", user.id);
-        await supabase.from("transactions").update({ status: "approved" }).eq("id", txId);
-        showMessage("Transaction approved. Balance updated.");
-        fetchAllUsers();
-        fetchTransactions();
+        try {
+          await patchJson(`/users/${encodeURIComponent(user.id)}`, { balance: newBalance });
+          await patchJson(`/transactions/${encodeURIComponent(txId)}`, { status: 'approved' });
+          showMessage("Transaction approved. Balance updated.");
+          await fetchAllUsers();
+          await fetchTransactions();
+        } catch (err) {
+          console.error('Approve TX failed', err);
+          showMessage('Failed to approve transaction', 'error');
+        }
       });
     });
 
     document.querySelectorAll(".reject-tx-btn").forEach(btn => {
       btn.addEventListener("click", async () => {
         const txId = btn.dataset.txid;
-        await supabase.from("transactions").update({ status: "rejected" }).eq("id", txId);
-        showMessage("Transaction rejected");
-        fetchTransactions();
+        try {
+          await patchJson(`/transactions/${encodeURIComponent(txId)}`, { status: 'rejected' });
+          showMessage("Transaction rejected");
+          await fetchTransactions();
+        } catch (err) {
+          console.error('Reject TX failed', err);
+          showMessage('Failed to reject transaction', 'error');
+        }
       });
     });
   }
@@ -439,41 +495,52 @@ function setupUILogic() {
   // Auth & Data Fetching
   // -------------------------
   async function checkAdmin() {
-    if (!supabase) {
+    // Validate local admin token
+    const token = localStorage.getItem(ADMIN_TOKEN_KEY) || sessionStorage.getItem(ADMIN_TOKEN_KEY);
+    if (!token) {
       window.location.href = "../admin-login.html";
       return false;
     }
-    const { data: { user }, error } = await supabase.auth.getUser();
-    if (error || !user) {
+    const m = token.match(/^fake-jwt-(\d+)$/);
+    if (!m) {
+      localStorage.removeItem(ADMIN_TOKEN_KEY); sessionStorage.removeItem(ADMIN_TOKEN_KEY);
       window.location.href = "../admin-login.html";
       return false;
     }
-    const { data: adminData, error: adminError } = await supabase
-      .from("admins")
-      .select("*")
-      .eq("id", user.id)
-      .single();
-    if (adminError || !adminData) {
-      await supabase.auth.signOut();
+    const id = m[1];
+    try {
+      const data = await getJson(`/admins?userId=${encodeURIComponent(id)}`);
+      if (!Array.isArray(data) || data.length === 0) {
+        localStorage.removeItem(ADMIN_TOKEN_KEY); sessionStorage.removeItem(ADMIN_TOKEN_KEY);
+        window.location.href = "../admin-login.html";
+        return false;
+      }
+      return true;
+    } catch (err) {
+      console.error('Admin check failed', err);
       window.location.href = "../admin-login.html";
       return false;
     }
-    return true;
   }
 
   async function fetchAllUsers() {
-    if (!supabase) return;
-    const { data, error } = await supabase
-      .from("users")
-      .select("*")
-      .order('created_at', { ascending: true });
-    if (error) {
-      console.error('Error fetching users:', error);
-      return showMessage("Failed to load users", "error");
+    try {
+      const data = await getJson('/users?_sort=created_at&_order=asc');
+      // normalize user fields expected by UI
+      allUsers = (data || []).map(u => ({
+        ...u,
+        isBanned: u.is_banned || u.isBanned || false,
+        isFrozen: u.is_frozen || u.isFrozen || false,
+        account_type: u.account_type || u.accountType || '',
+        verification: u.verification || '',
+        wallet: u.wallet || '',
+      }));
+      if (overviewUserContainer) renderOverviewUsers();
+      if (walletUserContainer) renderFilteredWalletUsers();
+    } catch (err) {
+      console.error('Error fetching users:', err);
+      showMessage('Failed to load users', 'error');
     }
-    allUsers = data;
-    if (overviewUserContainer) renderOverviewUsers();
-    if (walletUserContainer) renderFilteredWalletUsers();
   }
 
   // Start the dashboard

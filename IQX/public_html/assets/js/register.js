@@ -149,7 +149,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
       console.log('Checking username:', name); // Debug log
-      const response = await fetch(`https://iqxbackendapi.onrender.com/api/check-username?username=${encodeURIComponent(name)}`, {
+      const response = await fetch(`http://localhost:3000/users?username=${encodeURIComponent(name)}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -167,8 +167,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       const data = await response.json();
       console.log('Username check response:', data); // Debug log
-      
-      if (data.exists) {
+
+      // json-server returns an array for query results; if any item exists, username is taken
+      if (Array.isArray(data) && data.length > 0) {
         displayError(usernameError, 'Username taken.');
         usernameFeedback.textContent = 'Taken';
         usernameFeedback.classList.remove('valid');
@@ -253,7 +254,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
       // --- Call backend registration route
-      const res = await fetch('https://iqxbackendapi.onrender.com/api/register', {
+      const res = await fetch('http://localhost:3000/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -269,7 +270,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Registration failed.');
+      if (!res.ok && res.status !== 201) throw new Error(data.message || 'Registration failed.');
 
       showModal('Success', `Welcome ${username}! Redirecting to login...`, false);
       form.reset();

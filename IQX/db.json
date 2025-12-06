@@ -1,0 +1,70 @@
+{
+	"users": [
+		{
+			"id": 1,
+			"fullName": "Test User",
+			"username": "testuser",
+			"email": "test@example.com",
+			"phone": "+1234567890",
+			"password": "Password123!",
+			"accountType": "standard",
+			"account_type": "standard",
+			"verification": "verified",
+			"wallet": "0xABCDEF123456",
+			"status": "normal",
+			"country": "Neverland",
+			"currency": "USD",
+			"balance": 1000,
+			"roi": 150,
+			"active_trades": 2,
+			"deposits": 1,
+			"is_banned": false,
+			"is_frozen": false,
+			"created_at": "2025-12-06T00:00:00.000Z"
+		}
+	],
+	"admins": [
+		{
+			"id": 1,
+			"userId": 1,
+			"role": "superadmin"
+		}
+	],
+	"transactions": [
+		{
+			"id": 1,
+			"userId": 1,
+			"amount": 500,
+			"type": "deposit",
+			"status": "approved",
+			"created_at": "2025-12-01T12:00:00.000Z"
+		},
+		{
+			"id": 2,
+			"userId": 1,
+			"amount": 200,
+			"type": "withdraw",
+			"wallet_address": "0xABCDEF123456",
+			"status": "pending",
+			"created_at": "2025-12-05T08:30:00.000Z"
+		}
+	],
+	"walletConfig": {
+		"BTC": {
+			"Mainnet": {
+				"address": "1BoatSLRHtKNngkdXEeobR76b53LETtpyT"
+			},
+			"Testnet": {
+				"address": "mipcBbFg9gMiCh81Kj8tqqdgoZub1ZJRfn"
+			}
+		},
+		"ETH": {
+			"Mainnet": {
+				"address": "0x0000000000000000000000000000000000000000"
+			},
+			"Ropsten": {
+				"address": "0x1111111111111111111111111111111111111111"
+			}
+		}
+	}
+}

@@ -1,14 +1,8 @@
 // assets/js/admin.js
 
-// --- Supabase Configuration ---
-// IMPORTANT: These keys must match the ones used in your main dashboard script.
-const SUPABASE_URL = 'https://wreyaigjuecupzqysvfo.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndyZXlhaWdqdWVjdXB6cXlzdmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI4NTA2MzMsImV4cCI6MjA3ODQyNjYzM30.9ZKL97aUU_z1-b79JZIYUKTORRCsPt0yjZhuGRV48uY';
-
-// Initialize Supabase Client using the globally loaded library
-const supabase = window.supabase
-  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-  : null;
+// Using json-server locally for admin auth/authorization
+const API_BASE = 'http://localhost:3000';
+const TOKEN_KEY = 'iqxAdminToken';
 
 // --- DOM Elements ---
 const adminEmailInput = document.getElementById('adminEmail');
@@ -33,43 +27,39 @@ function showMessage(msg, type = 'error') {
  * This function prevents the infinite redirect loop on the login page.
  */
 async function checkAuthAndRedirect() {
-    if (!supabase) {
-        showMessage('Error: Supabase client not initialized.', 'error');
+    // Check for existing fake token saved in local/session storage
+    const token = localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY);
+    if (!token) {
+        if (adminLoginBtn) { adminLoginBtn.disabled = false; adminLoginBtn.textContent = 'Login'; }
         return;
     }
 
+    const m = token.match(/^fake-jwt-(\d+)$/);
+    if (!m) {
+        localStorage.removeItem(TOKEN_KEY); sessionStorage.removeItem(TOKEN_KEY);
+        if (adminLoginBtn) { adminLoginBtn.disabled = false; adminLoginBtn.textContent = 'Login'; }
+        return;
+    }
+
+    const id = m[1];
     try {
-        // Check for an existing session/user
-        const { data: { user } } = await supabase.auth.getUser();
-
-        if (user) {
-            // Check if the authenticated user ID is listed in the 'admins' table
-            const { data: adminData } = await supabase
-                .from("admins")
-                .select("id")
-                .eq("id", user.id)
-                .single();
-
-            if (adminData) {
-                // SUCCESS: Admin logged in, redirect to dashboard
-                window.location.href = "./Admin-Dashboard/dashboard.html";
-                return; 
-            } else {
-                // User logged in but not an authorized admin. Sign them out.
-                await supabase.auth.signOut();
-                showMessage('Unauthorized user signed out. Please use admin credentials.', 'error');
-            }
+        const res = await fetch(`${API_BASE}/admins?userId=${encodeURIComponent(id)}`);
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+            // Admin exists — redirect to dashboard
+            window.location.href = "./Admin-Dashboard/dashboard.html";
+            return;
+        } else {
+            // Not an admin: clear token and show message
+            localStorage.removeItem(TOKEN_KEY); sessionStorage.removeItem(TOKEN_KEY);
+            showMessage('Unauthorized user signed out. Please use admin credentials.', 'error');
         }
     } catch (e) {
-        console.error("Auth check failed:", e);
+        console.error('Auth check failed:', e);
         showMessage('An error occurred during authentication check.', 'error');
     }
 
-    // Enable the login button once the check is complete and no redirect occurred
-    if (adminLoginBtn) {
-        adminLoginBtn.disabled = false;
-        adminLoginBtn.textContent = 'Login';
-    }
+    if (adminLoginBtn) { adminLoginBtn.disabled = false; adminLoginBtn.textContent = 'Login'; }
 }
 
 /** Handles the admin login process when the button or form is submitted. */
@@ -88,16 +78,30 @@ async function handleAdminLogin() {
     const password = adminPasswordInput.value;
 
     try {
-        // 1. Attempt to sign in with email and password
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-
-        if (error) {
-            showMessage(`Login failed: ${error.message}`, 'error');
+        // 1. Query json-server users resource for matching credentials
+        const q = `email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
+        const res = await fetch(`${API_BASE}/users?${q}`);
+        const users = await res.json();
+        if (!Array.isArray(users) || users.length === 0) {
+            showMessage('Login failed: Invalid email or password.', 'error');
             return;
         }
-        
-        // 2. If sign-in is successful, check admin status and redirect
-        await checkAuthAndRedirect();
+        const user = users[0];
+
+        // 2. Verify admin membership in /admins by userId
+        const adminRes = await fetch(`${API_BASE}/admins?userId=${encodeURIComponent(user.id)}`);
+        const adminData = await adminRes.json();
+        if (!Array.isArray(adminData) || adminData.length === 0) {
+            showMessage('Unauthorized user. You are not an admin.', 'error');
+            return;
+        }
+
+        // 3. Successful admin login — store fake token and redirect
+        const token = `fake-jwt-${user.id}`;
+        localStorage.setItem(TOKEN_KEY, token);
+        // Optional: store minimal admin info
+        localStorage.setItem('iqxAdminUser', JSON.stringify({ id: user.id, email: user.email }));
+        window.location.href = "./Admin-Dashboard/dashboard.html";
 
     } catch (e) {
         console.error("Login process error:", e);
