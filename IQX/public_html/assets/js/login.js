@@ -114,4 +114,6 @@ document.addEventListener('DOMContentLoaded', () => {
         .catch(() => {});
     }
   }
+
+  // localStorage.clear();
 });

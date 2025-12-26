@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IQX | Deposit</title>
+    <title>IQX | Withdraw</title>
     <link rel="stylesheet" href="../assets/css/dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
@@ -21,9 +21,9 @@
                     <li><a href="dashboard.html"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
                     <li><a href="market.html"><i class="fa-solid fa-chart-line"></i><span>Market & Pairs</span></a></li>
                     <li><a href="trade.html"><i class="fa-solid fa-money-bill-trend-up"></i><span>Trade</span></a></li>
-                    <li><a href="#" class="active"><i
-                                class="fa-solid fa-money-bill-transfer"></i><span>Deposit</span></a></li>
-                    <li><a href="withdraw.html"><i class="fas arrow-up"></i><span>Withdraw</span></a></li>
+                    <li><a href="deposit.html"><i class="fa-solid fa-money-bill-transfer"></i><span>Deposit</span></a>
+                    </li>
+                    <li><a href="#" class="active"><i class="fas arrow-up"></i><span>Withdraw</span></a></li>
 
                     <li><a href="settings.html"><i class="fa-solid fa-user-gear"></i><span>Settings</span></a></li>
                     <li><a href="support.html"><i class="fa-solid fa-ticket"></i><span>Support</span></a></li>
@@ -66,20 +66,20 @@
             </header>
 
             <main id="content">
-                <h1 id="page-title">Deposit</h1>
+                <h1 id="page-title">Withdraw</h1>
 
                 <span class="card-title">Available Balance:</span>
                 <p><span class="card-value positive" id="balanceAmount">$0.00</span></p>
 
-                <div class="modal-center" id="addModal">
+                <div class="modal-center" id="withdrawModal">
                     <div class="form-box">
                         <h2>Deposit Funds</h2>
-                        <form id="depositForm" enctype="multipart/form-data">
+                        <form id="withdrawForm" enctype="multipart/form-data">
                             <label>Deposit Wallet Address (USDT TRC-20)</label>
-                            <input type="text" id="depositWalletAddress" value="Loading..." readonly>
+                            <input type="text" id="withdrawWalletAddress" value="0x01dhh532ewj..." required>
 
                             <label for="amount">Amount (USD)</label>
-                            <input type="number" id="addAmount" name="amount" required>
+                            <input type="number" id="withdrawAmount" name="amount" required>
 
                             <label for="method">Payment Method</label>
                             <select name="method" id="method" required>
@@ -96,13 +96,13 @@
                                 <option value="ETH" disabled>ETH (Available soon)</option>
                             </select>
 
-                            <label for="proof">Upload Proof of Payment</label>
-                            <input type="file" id="proof" name="proof" accept="image/*,application/pdf" required>
+                            <!-- <label for="proof">Upload Proof of Payment</label>
+                            <input type="file" id="proof" name="proof" accept="image/*,application/pdf" required> -->
 
-                            <button type="submit" class="confirm-btn confirmAdd" id="confirmAdd">Confirm
-                                Deposit</button>
+                            <button type="submit" class="confirm-btn confirmWithdraw" id="confirmWithdraw">Confirm
+                                Withdrawal</button>
 
-                            <p class="status-msg" id="statusAdd"></p>
+                            <p class="status-msg" id="statusWithdraw"></p>
                         </form>
                     </div>
                 </div>

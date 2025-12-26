@@ -1,4 +1,4 @@
-// dashboard.js — Full Node.js + Express + Neon migration (copy/paste)
+// dashboard.js — Full Node.js + Express migration
 
 // Configuration (json-server)
 const API_BASE_URL = 'http://localhost:3000'; // json-server base URL
@@ -132,18 +132,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       // Special-case: profile endpoint -> map to /users/:id using our fake token
       if (endpoint === '/user/profile') {
-        if (!token) {
-          localStorage.removeItem(TOKEN_KEY);
+        const storedUserJson = localStorage.getItem('iqxUser') || sessionStorage.getItem('iqxUser');
+        
+        const token = localStorage.getItem('iqxToken') || sessionStorage.getItem('iqxToken');
+
+        if (!token || !storedUserJson) {
+          localStorage.removeItem('iqxToken');
+          sessionStorage.removeItem('iqxToken');
           window.location.href = '../login/login.html';
           return null;
         }
-        const m = token.match(/^fake-jwt-(\d+)$/);
-        if (!m) {
-          localStorage.removeItem(TOKEN_KEY);
-          window.location.href = '../login/login.html';
-          return null;
-        }
-        const id = m[1];
+
+        const storedUser = JSON.parse(storedUserJson);
+        const id = storedUser.id;
+
+
+        // const m = token.match(/^fake-jwt-(\d+)$/);
+        // if (!m) {
+        //   localStorage.removeItem(TOKEN_KEY);
+        //   window.location.href = '../login/login.html';
+        //   return null;
+        // }
+        // const id = m[1];
         const response = await fetch(`${API_BASE_URL}/users/${id}`);
         if (!response.ok) throw new Error('Failed to fetch user profile');
         return await response.json();
@@ -319,8 +329,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     safeText(DOM.profileName, `Welcome, ${userProfile?.username || 'User'}`);
     safeText(DOM.balanceAmount, formatUSD(userProfile?.balance));
     safeText(DOM.roi, formatUSD(userProfile?.roi));
-    safeText(DOM.initialInvestment, formatUSD(userProfile?.active_trades));
-    safeText(DOM.activeDeposit, `${userProfile?.deposits ?? 0} active deposits`);
+    safeText(DOM.initialInvestment, `${userProfile?.active_trades ?? 0} active trades`);
+    safeText(DOM.activeDeposit, formatUSD(userProfile?.deposits));
   }
 
   function startUserProfilePolling() {
@@ -752,17 +762,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function initAuthAndStart() {
     // Load session user if exists
-    const token = localStorage.getItem(TOKEN_KEY);
+    const token = localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY);
     if (!token) {
       // No active session - redirect
       console.warn('No active user session found; redirecting to login.');
       window.location.href = '../login/login.html';
+      // console.log("Current Token Key:", TOKEN_KEY);
+      // console.log("Token Value found:", token);
       return;
     }
 
+
     try {
       // Verify token and get user data
-      const userData = await apiRequest('/user/profile');
+      const userData = await apiRequest('/users');
       if (!userData) {
         throw new Error('Invalid session');
       }
@@ -817,8 +830,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     await initAuthAndStart();
 
     // initial debug popup
-    showPopup('Dashboard loaded — polling enabled', true);
+    showPopup(`Welcome, ${userProfile?.username || 'User'}`, true);
   } catch (err) {
     console.error('dashboard boot error', err);
   }
+
+  // localStorage.clear(TOKEN_KEY);
 });
